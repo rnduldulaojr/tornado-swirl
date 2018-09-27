@@ -140,3 +140,11 @@ Swagger spec will look something like:
 
 
 ```
+
+## Credits to:
+
+We used SerenaFeng's [tornado-swagger](https://github.com/SerenaFeng/tornado-swagger) as starting point for this project.
+
+We decided on (almost like) Google style module docs for the doc format since epydoc used in tornado-swagger has been a discontinued project and
+did not work on Python 3.  We wanted to maintain a uniform python docstring format across all our projects so we decided on extracting OpenAPI 2.0 
+data from our existing/common docstring format so we made our own parser based on [Brian Ray's Medium article on FSMs](https://medium.com/@brianray_7981/tutorial-write-a-finite-state-machine-to-parse-a-custom-language-in-pure-python-1c11ade9bd43). 
