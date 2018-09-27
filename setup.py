@@ -6,13 +6,13 @@ except ImportError:
 with open('README') as file:
     long_description = file.read()
 
-setup(name='tornado-swagger',
-      version='1.0',
-      url='https://github.com/SerenaFeng/tornado-swagger',
+setup(name='tornado-swirl',
+      version='0.1',
+      url='https://github.com/rduldulao/tornado-swirl',
       zip_safe=False,
-      packages=['tornado_swagger'],
+      packages=['tornado_swirl'],
       package_data={
-        'tornado_swagger': [
+        'tornado_swirl': [
           'static/*.*',
           'static/css/*.*',
           'static/images/*.*',
@@ -21,11 +21,10 @@ setup(name='tornado-swagger',
         ]
       },
       description='Extract swagger specs from your tornado project',
-      author='Serena Feng',
+      author='Rodolfo Duldulao',
       license='MIT',
       long_description=long_description,
       install_requires=[
-        'tornado>=3.1,<=4.3',
-        'epydoc>=0.3.1'
+        'tornado>=5.1.1',
       ],
 )
