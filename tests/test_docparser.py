@@ -46,7 +46,6 @@ Path Parameters:
     path_spec = parse_from_docstring(docstring)
     assert path_spec.summary == "This is the simple description.\nWith a second line.\n"
     assert path_spec.description == "Long description.\nWith a second line.\n"
-    assert path_spec.path_params_section == "    employee_uid (int) -- The employee ID.\n"
 
     pp = path_spec.path_params.get('employee_uid')
     assert pp.name == 'employee_uid'
@@ -71,8 +70,6 @@ Query Parameters:
     path_spec = parse_from_docstring(docstring)
     assert path_spec.summary == "This is the simple description.\nWith a second line.\n"
     assert path_spec.description == "Long description.\nWith a second line.\n"
-    assert path_spec.path_params_section == ""
-    assert path_spec.query_params_section == "    param1 (int) -- The param 1.\n    param2 (Model) -- Required. The param 2.\n"
     
     qp = path_spec.query_params.get("param1")
     assert qp is not None
@@ -108,8 +105,6 @@ Request Body:
     path_spec = parse_from_docstring(docstring)
     assert path_spec.summary == "This is the simple description.\nWith a second line.\n"
     assert path_spec.description == "Long description.\nWith a second line.\n"
-    assert path_spec.path_params_section == ""
-    assert path_spec.query_params_section == "    param1 (int) -- The param 1.\n    param2 (Model) -- Required. The param 2.\n"
     
     qp = path_spec.query_params.get("param1")
     assert qp is not None
@@ -155,8 +150,6 @@ Request Body:
     path_spec = parse_from_docstring(docstring)
     assert path_spec.summary == "This is the simple description.\nWith a second line.\n"
     assert path_spec.description == "Long description.\nWith a second line.\n"
-    assert path_spec.path_params_section == ""
-    assert path_spec.query_params_section == "    param1 (int) -- The param 1.\n    param2 (Model) -- Required. The param 2.\n"
     
     qp = path_spec.query_params.get("param1")
     assert qp is not None

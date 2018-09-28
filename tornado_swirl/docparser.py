@@ -81,6 +81,7 @@ class PathSpec(object):
 
         
     def _parse_query_params_section(self):
+        print(self.query_params_section)
         if not self.query_params_section:
             return
 
@@ -125,6 +126,15 @@ class PathSpec(object):
             else:
                 cleaned_lines[-1] = cleaned_lines[-1] + " " + cur_line.strip()
         return cleaned_lines
+
+    
+    def _clean_buffers(self):
+        self.body_section = ""
+        self.cookie_section = ""
+        self.formData_section = ""
+        self.path_params_section = ""
+        self.query_params_section = ""
+        
 
 
 
@@ -176,13 +186,10 @@ def transition_description(fsm_obj):
         fsm_obj.path_spec.description = fsm_obj.current_line.lstrip()
 
 def transition_path_params(fsm_obj):
-    if is_path_params_line(fsm_obj.current_line):
-        return #do nothing
-    
     fsm_obj.path_spec.path_params_section += fsm_obj.current_line
     
 def transition_query_params(fsm_obj):
-    fsm_obj.path_spec.query_params_section += fsm_obj.current_line   
+    fsm_obj.path_spec.query_params_section += fsm_obj.current_line
 
 def transition_request_body(fsm_obj):
     fsm_obj.path_spec.body_section += fsm_obj.current_line
@@ -219,7 +226,7 @@ def is_path_params_line(line):
     return line.strip().lower() in ('path parameter:', 'path param:', 'path parameters:', 'path params:', 'url parameters:', 'url params:')
 
 def is_query_params_line(line):
-    return line.strip().lower() in ('query parameters:', 'query params:', 'query parameters:', 'query params:')
+    return line.strip().lower() in ('query parameters:', 'query params:', 'query parameter:', 'query param:')
 
 def is_request_body_line(line):
     return line.strip().lower() == 'request body:'
@@ -352,6 +359,8 @@ class Parse_FSM:
         self.path_spec._parse_body_param_section()
         self.path_spec._parse_header_param_section()
         self.path_spec._parse_cookie_param_section()
+        #TODO: 
+        self.path_spec._clean_buffers()
 
     def process_next(self, line):
         self.current_line = line
