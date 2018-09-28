@@ -40,7 +40,7 @@ class SwaggerResourcesHandler(tornado.web.RequestHandler):
         u = urlparse(self.request.full_url())
         resources = {
             'apiVersion': self.api_version,
-            'swaggerVersion': SWAGGER_VERSION,
+            'swagger': SWAGGER_VERSION,
             'basePath': '%s://%s' % (u.scheme, u.netloc),
             'produces': ["application/json"],
             'description': 'Test Api Spec',
@@ -62,13 +62,17 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         self.set_header('content-type', 'application/json')
         apis = self.find_api(self.application)  # this is a generator
         specs = {
-            'apiVersion': self.api_version,
             'swagger': SWAGGER_VERSION,
+            'info': {
+                'title': "Sample API",
+                'description': "Foo bar",
+                'version': self.api_version,
+            },
             'basePath': self.request.protocol + "://" + self.request.host + "/",
             'schemes': ["http", "https"],
             'consumes': ['application/json'],
             'produces': ['application/json'],
-            'paths': [self.__get_api_spec(path, spec, operations) for path, spec, operations in apis]
+            'paths': { path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis}
         }
         # if apis is None:
         #     raise tornado.web.HTTPError(404)
@@ -99,21 +103,21 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         }
 
     def __get_api_spec(self, path, spec, operations):
-        return {
-            path: {
+        return{
                 api[0]: {
                     # 'nickname': api.nickname,
                     # 'parameters': api.params.values(),
                     'operationId': str(spec.__name__) + "." + api[0],
                     'summary': api[1].summary.strip(),
                     'description': api[1].description.strip(),
-                    'parameters': self.__get_params(api[1])
+                    'parameters': self.__get_params(api[1]),
+                    'responses': self.__get_responses(api[1])
                     # 'notes': api.notes,
                     # 'responseClass': api.responseClass,
                     # 'responseMessages': api.responseMessages,
                 } for api in operations
             }
-        }
+        
 
     def __get_params(self, path_spec):
         params = []
@@ -126,18 +130,26 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             [path_spec.body_param]
         for param in allps:
             if param:
-                params.append({
+                param_data = {
                     "in": param.ptype,
                     "name": param.name,
-                    "schema": #{
-                        self.__get_type(param),
-                        # TODO: support other schema elements
-                        # TODO: support references
-                        #"type": param.type,
-                    #},
                     "required": param.required,
                     "description": str(param.description).strip()
-                })
+                }
+                param_data.update(self.__get_type(param))
+                params.append(param_data)
+
+        return params
+
+    def __get_responses(self, path_spec):
+        params = {}
+        allresps = sorted(path_spec.responses.values(), key=lambda x: x.name)
+        for param in allresps:
+            if param:
+                params[param.name] = {
+                    "description": param.description,
+                    "schema": self.__get_type(param)
+                }
         return params
 
     def __get_type(self, param):
@@ -151,6 +163,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return {
             "type": param.type
         }
+
     @staticmethod
     def find_api(application):
         for route_spec in api_routes():

@@ -13,6 +13,7 @@ from tornado_swirl import docparser
 def is_rest_api_method(object):
     return (inspect.isfunction(object) or inspect.ismethod(object)) and object.__name__ in ('get', 'post', 'put', 'delete')
 
+
 def restapi(url, **kwargs):
     def _real_decorator(cls):
         cls.rest_api = True
@@ -28,10 +29,12 @@ def restapi(url, **kwargs):
                 setattr(member, 'path_spec', path_spec)
                 cls.tagged_api_comps.append(name)
         add_api_handler(cls)
-        add_route(url, cls, **kwargs)      
+        add_route(url, cls, **kwargs)
         return cls
     return _real_decorator
 
+
 class Application(tornado.web.Application):
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):
-        super(Application, self).__init__(swagger_handlers() + handlers, default_host, transforms, **settings)
+        super(Application, self).__init__(swagger_handlers() +
+                                          handlers, default_host, transforms, **settings)

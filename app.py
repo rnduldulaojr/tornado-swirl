@@ -13,7 +13,10 @@ class MainHandler(tornado.web.RequestHandler):
         Test description
 
         Query Params:
-            param1 (int) -- test
+            param1 (integer) -- test
+
+        Response:
+            docs ([docs]) -- Foomanchu
         """
         self.finish()
 
@@ -32,6 +35,9 @@ class TestHandler(tornado.web.RequestHandler):
         Path Params:
             emp_uid (int) -- test
             date ([string]) -- test
+
+        200 Response:
+            test (string) -- Test data
         """
         self.finish()
 
@@ -44,7 +50,7 @@ class ItemHandler(tornado.web.RequestHandler):
         Gets Item data from database.
 
         Path Parameter:
-            itemid (int) -- The item id
+            itemid (integer) -- The item id
         """
         pass
 

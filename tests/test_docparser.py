@@ -246,3 +246,63 @@ def test_cookie_section():
     assert cookie.type == 'string'
     assert cookie.required
     assert cookie.description == 'Cookie monster raaa'
+
+
+def test_response_200():
+    docstring = """Response 200
+
+    Response:
+        x (Model) -- Response 200
+    """
+    path_spec = parse_from_docstring(docstring)
+
+    assert path_spec.responses
+    response = path_spec.responses.get("200") # response ids are the http code
+    assert response
+    assert response.description == "Response 200"
+
+def test_response_200_alternate_format():
+    docstring = """Response 200
+
+    200 Response:
+        x (Model) -- Response 200
+    """
+    path_spec = parse_from_docstring(docstring)
+
+    assert path_spec.responses
+    response = path_spec.responses.get("200") # response ids are the http code
+    print(path_spec.responses)
+    assert response
+    assert response.description == "Response 200"
+    
+
+def test_response_201():
+    docstring = """Response 200
+
+    201 Response:
+        None  -- ACCEPTED
+    """
+    path_spec = parse_from_docstring(docstring)
+
+    assert path_spec.responses
+    response = path_spec.responses.get("201") # response ids are the http code
+    print(path_spec.responses)
+    assert response
+    assert response.description == "ACCEPTED"
+
+def test_error_responses():
+    docstring = """Response 200
+
+    Error Responses:
+        400 -- {Not A Good Request}
+        500 -- Hello
+    """
+    path_spec = parse_from_docstring(docstring)
+
+    assert path_spec.responses
+    response = path_spec.responses.get("400") # response ids are the http code
+    assert response
+    assert response.description == "{Not A Good Request}"
+    response = path_spec.responses.get("500") # response ids are the http code
+    assert response
+    assert response.description == "Hello"
