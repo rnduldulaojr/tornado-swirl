@@ -40,7 +40,7 @@ class SwaggerResourcesHandler(tornado.web.RequestHandler):
         u = urlparse(self.request.full_url())
         resources = {
             'apiVersion': self.api_version,
-            'swagger': SWAGGER_VERSION,
+            'openapi': SWAGGER_VERSION,
             'basePath': '%s://%s' % (u.scheme, u.netloc),
             'produces': ["application/json"],
             'description': 'Test Api Spec',
@@ -62,17 +62,19 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         self.set_header('content-type', 'application/json')
         apis = self.find_api(self.application)  # this is a generator
         specs = {
-            'swagger': SWAGGER_VERSION,
+            'openapi': SWAGGER_VERSION,
             'info': {
                 'title': "Sample API",
                 'description': "Foo bar",
                 'version': self.api_version,
             },
-            'basePath': self.request.protocol + "://" + self.request.host + "/",
+            'servers': [{"url": self.request.protocol + "://" + self.request.host + "/",
+                         "description": "This server"
+                         }],
             'schemes': ["http", "https"],
             'consumes': ['application/json'],
             'produces': ['application/json'],
-            'paths': { path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis}
+            'paths': {path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis}
         }
         # if apis is None:
         #     raise tornado.web.HTTPError(404)
@@ -104,20 +106,19 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def __get_api_spec(self, path, spec, operations):
         return{
-                api[0]: {
-                    # 'nickname': api.nickname,
-                    # 'parameters': api.params.values(),
-                    'operationId': str(spec.__name__) + "." + api[0],
-                    'summary': api[1].summary.strip(),
-                    'description': api[1].description.strip(),
-                    'parameters': self.__get_params(api[1]),
-                    'responses': self.__get_responses(api[1])
-                    # 'notes': api.notes,
-                    # 'responseClass': api.responseClass,
-                    # 'responseMessages': api.responseMessages,
-                } for api in operations
-            }
-        
+            api[0]: {
+                # 'nickname': api.nickname,
+                # 'parameters': api.params.values(),
+                'operationId': str(spec.__name__) + "." + api[0],
+                'summary': api[1].summary.strip(),
+                'description': api[1].description.strip(),
+                'parameters': self.__get_params(api[1]),
+                'responses': self.__get_responses(api[1])
+                # 'notes': api.notes,
+                # 'responseClass': api.responseClass,
+                # 'responseMessages': api.responseMessages,
+            } for api in operations
+        }
 
     def __get_params(self, path_spec):
         params = []
@@ -148,21 +149,98 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             if param:
                 params[param.name] = {
                     "description": param.description,
-                    "schema": self.__get_type(param)
+                    "content": 
+                        self._detect_content(param)  #should return default produces if none, otherwise detect from type
                 }
+
+                #TODO: implement examples
         return params
+
+    def _detect_content(self, param):
+        
+        if param.type not in ('integer','int','string','str','boolean', 'bool', 'number', 'int32', 'int64',
+            'float', 'double', "byte", "binary", "date", "date-time", "password" ):
+            if param.type == "array":
+                return {"application/json": {
+                    "schema": {
+                        "type": "array",
+                        "items": param.itype #TODO: apply refs 
+                    }}
+                }
+            
+            return {"application/json": {
+                "schema": {
+                    "type": param.type #TODO: apply type
+                }
+            }}
+        #TODO: other media types
+        return {
+            "text/plain": {
+                "schema": {
+                    "type": param.type
+                }
+            }
+        }
+        
+        
+
+    def __get_real_type(self, typestr):
+        if typestr in ("int", "integer"):
+            return {"schema": {
+                "type": "integer",
+                "format": "int32"
+            }}
+        
+        if typestr == "long":
+            return {"schema": {
+                "type": "integer",
+                "format": "int64"
+            }}
+
+        if typestr in ("float", "double"):
+            return {"schema": {
+                "type": "number",
+                "format": typestr
+            }}
+
+        if typestr in ("byte", "binary", "date", "password"):
+            return {"schema": {
+                "type": "string",
+                "format": typestr
+            }}
+
+        if typestr == "dateTime":
+            return {"schema": {
+                "type": "string",
+                "format": "date-time"
+            }}
+
+        if typestr in ("str", "string"):
+            return {"schema": {
+                "type": "string"
+            }}
+
+        if typestr == "bool":
+            return {"schema": {
+                "type": "boolean"
+            }}
+
+        return {"schema": {
+            "type": typestr
+        }}
+        # TODO check if typestr is a reference
 
     def __get_type(self, param):
         if param.type == "array":
-            return {
-                "type": "array",
-                "items": {
-                    "type": param.itype
-                }
+            return {"schema": {
+                        "type": "array",
+                        "items": {
+                            "type": param.itype
+                        }
             }
-        return {
-            "type": param.type
-        }
+            }
+        real_type = self.__get_real_type(param.type)
+        return real_type
 
     @staticmethod
     def find_api(application):

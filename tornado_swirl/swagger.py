@@ -34,6 +34,13 @@ def restapi(url, **kwargs):
     return _real_decorator
 
 
+def model(cls):
+    cls.rest_model = True
+    name = cls.__name__
+    
+
+
+
 class Application(tornado.web.Application):
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):
         super(Application, self).__init__(swagger_handlers() +

@@ -13,10 +13,10 @@ class MainHandler(tornado.web.RequestHandler):
         Test description
 
         Query Params:
-            param1 (integer) -- test
+            param1 (integer) -- required. test
 
         Response:
-            docs ([docs]) -- Foomanchu
+            docs ([string]) -- Foomanchu
         """
         self.finish()
 
@@ -34,10 +34,13 @@ class TestHandler(tornado.web.RequestHandler):
 
         Path Params:
             emp_uid (int) -- test
-            date ([string]) -- test
+            date (date) -- test
 
         200 Response:
             test (string) -- Test data
+        
+        Error Response:
+            400  -- Fudge
         """
         self.finish()
 
@@ -55,11 +58,10 @@ class ItemHandler(tornado.web.RequestHandler):
         pass
 
 def make_app():
-    return Application(api_routes())
+    return Application(api_routes(), autoreload=True)
 
 if __name__ == "__main__":
     app = make_app()
     app.debug = True
-    app.autoreload = True
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()

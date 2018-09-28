@@ -3,7 +3,7 @@ import os.path
 
 __author__ = 'rduldulao'
 
-SWAGGER_VERSION = '2.0'
+SWAGGER_VERSION = '3.0.0'
 
 URL_SWAGGER_API_DOCS = 'swagger-api-docs'
 URL_SWAGGER_API_LIST = 'swagger-api-list'
