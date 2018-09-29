@@ -12,7 +12,7 @@ name (type) -- (required?) description
 
 ```type``` and ```required```  (which can be "Required." or "Optional.") as well as ```description``` can be optional.  
 
-Example docstring:
+### Example docstring:
 
 
 ```python
@@ -39,6 +39,22 @@ Errors:
     404 -- {"code": 404, "message": "Not Found"}.
 
 """
+```
+
+### Example Schema Docstring
+
+```python
+"""
+The User class.
+
+User from database.
+
+Properties:
+    name (string) -- Required.  User full name.
+    age (int) -- User's age.
+        minimum: 1   maximum: 100
+"""
+
 ```
 
 [THIS IS A WORK IN PROGRESS, comments/criticisms are welcome.]
@@ -82,7 +98,7 @@ class User(object):
 
     """
     pass
-    
+
 
 
 def make_app():
@@ -113,9 +129,18 @@ Swagger spec will look something like:
 
 ```json
 {
-    "apiVersion": "v1.0",
-    "swagger": "2.0",
-    "basePath": "http://localhost:8888/",
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Sample API",
+        "description": "Foo bar",
+        "version": "v1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8888/",
+            "description": "This server"
+        }
+    ],
     "schemes": [
         "http",
         "https"
@@ -126,28 +151,158 @@ Swagger spec will look something like:
     "produces": [
         "application/json"
     ],
-    "paths": [
-        {
-            "/item/{itemid}": {
-                "get": {
-                    "operationId": "ItemHandler.get",
-                    "summary": "Get Item data.",
-                    "description": "Gets Item data from database.",
-                    "parameters": [
-                        {
-                            "in": "path",
-                            "name": "itemid",
-                            "schema": {
-                                "type": "int"
-                            },
-                            "required": true,
-                            "description": "The item id"
+    "paths": {
+        "/test": {
+            "get": {
+                "operationId": "MainHandler.get",
+                "summary": "Test summary",
+                "description": "Test description",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "param1",
+                        "required": true,
+                        "description": "test",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "maximum": 200,
+                            "minimum": 1
                         }
-                    ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Foomanchu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/test/{emp_uid}/{date}": {
+            "get": {
+                "operationId": "TestHandler.get",
+                "summary": "Test get",
+                "description": "Hiho",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "emp_uid",
+                        "required": true,
+                        "description": "test",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "in": "path",
+                        "name": "date",
+                        "required": true,
+                        "description": "test",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "in": "cookie",
+                        "name": "x",
+                        "required": false,
+                        "description": "some foo",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Test user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Fudge",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/item/{itemid}": {
+            "get": {
+                "operationId": "ItemHandler.get",
+                "summary": "Get Item data.",
+                "description": "Gets Item data from database.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "itemid",
+                        "required": true,
+                        "description": "The item id",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "age": {
+                        "type": "integer",
+                        "format": "int32",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
                 }
             }
         }
-    ]
+    }
 }
 
 
@@ -158,5 +313,5 @@ Swagger spec will look something like:
 We used SerenaFeng's [tornado-swagger](https://github.com/SerenaFeng/tornado-swagger) as starting point for this project.
 
 We decided on (almost like) Google style module docs for the doc format since epydoc used in tornado-swagger has been a discontinued project and
-did not work on Python 3.  We wanted to maintain a uniform python docstring format across all our projects so we decided on extracting OpenAPI 2.0 
+did not work on Python 3.  We wanted to maintain a uniform python docstring format across all our projects so we decided on extracting OpenAPI 3.0 
 data from our existing/common docstring format so we made our own parser based on [Brian Ray's Medium article on FSMs](https://medium.com/@brianray_7981/tutorial-write-a-finite-state-machine-to-parse-a-custom-language-in-pure-python-1c11ade9bd43). 
