@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from urllib.parse import urlparse, urljoin
 import inspect
@@ -10,8 +9,7 @@ import json
 import re
 
 
-__author__ = 'serena'
-
+__author__ = 'rduldulao'
 
 def json_dumps(obj, pretty=False):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)

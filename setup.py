@@ -14,10 +14,6 @@ setup(name='tornado-swirl',
       package_data={
         'tornado_swirl': [
           'static/*.*',
-          'static/css/*.*',
-          'static/images/*.*',
-          'static/lib/*.*',
-          'static/lib/shred/*.*',
         ]
       },
       description='Extract swagger specs from your tornado project',
