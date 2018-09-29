@@ -5,7 +5,7 @@ import inspect
 import tornado.web
 import tornado.template
 from tornado.util import re_unescape
-from .settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC, models, api_routes
+from .settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC, api_routes
 import json
 import re
 
@@ -76,16 +76,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             'produces': ['application/json'],
             'paths': {path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis}
         }
-        # if apis is None:
-        #     raise tornado.web.HTTPError(404)
-
-        # specs = {
-        #     'apiVersion': self.api_version,
-        #     'swaggerVersion': SWAGGER_VERSION,
-        #     'basePath': urljoin(self.request.full_url(), self.base_url)[:-1],
-        #     'apis': [self.__get_api_spec__(path, spec, operations) for path, spec, operations in apis],
-        #     #'models': self.__get_models_spec(models)
-        # }
+        
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
     def __get_models_spec(self, models):
@@ -107,16 +98,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
     def __get_api_spec(self, path, spec, operations):
         return{
             api[0]: {
-                # 'nickname': api.nickname,
-                # 'parameters': api.params.values(),
                 'operationId': str(spec.__name__) + "." + api[0],
                 'summary': api[1].summary.strip(),
                 'description': api[1].description.strip(),
                 'parameters': self.__get_params(api[1]),
                 'responses': self.__get_responses(api[1])
-                # 'notes': api.notes,
-                # 'responseClass': api.responseClass,
-                # 'responseMessages': api.responseMessages,
+                
             } for api in operations
         }
 
@@ -127,8 +114,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             sorted(path_spec.header_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.query_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.form_params.values(), key=lambda x: x.order) + \
-            sorted(path_spec.cookie_params.values(), key=lambda x: x.order) + \
-            [path_spec.body_param]
+            sorted(path_spec.cookie_params.values(), key=lambda x: x.order) #+ \
+            #[path_spec.body_param] body param
         for param in allps:
             if param:
                 param_data = {

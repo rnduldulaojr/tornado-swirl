@@ -21,11 +21,12 @@ default_settings = {
     'exclude_namespaces': [],
 }
 
-models = []
+_SCHEMAS = {}
 
 _ROUTES = []
 
 _API_HANDLERS = []
+
 def get_api_handlers() -> list:
     return _API_HANDLERS
 
@@ -37,3 +38,9 @@ def add_route(path, handler,  **kwargs):
 
 def api_routes():
     return _ROUTES
+
+def get_schemas() -> dict:
+    return _SCHEMAS
+
+def add_schema(name, cls):
+    _SCHEMAS[name] = cls

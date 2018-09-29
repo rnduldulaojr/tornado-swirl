@@ -2,7 +2,7 @@
 
 ## What is tornado-swirl?
 Tornado-swirl is a wrapper for tornado which enables swagger-ui support, adapted from Serena Feng's tornado-swagger project and then
-heavily modified to work with Tornado 5 and Python 3 and uses Google-style docstrings to get OpenAPI 2.0 API path descriptors.  
+heavily modified to work with Tornado 5 and Python 3 and uses Google-style docstrings to get OpenAPI 3.0 API path descriptors.  
 
 Parameters(query, path, cookie, header, request body) need to be specified in their own sections and each parameter is described as follows:
 
