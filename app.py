@@ -14,7 +14,7 @@ class MainHandler(tornado.web.RequestHandler):
 
         Query Params:
             param1 (integer) -- required. test
-                minimum: 1  maximum: 200
+                minimum: 1  maximum: 200  exclusiveMaximum: true
 
         Response:
             docs ([string]) -- Foomanchu

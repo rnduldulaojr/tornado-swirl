@@ -24,11 +24,15 @@ class number(numbers.Number):
             return int(val)
         except ValueError:
             return val
-            
+
+class boolean(object):
+    def __new__(cls, val):
+        return val in ('True', 'true', '1')
+                   
         
 
 _PROPS_TYPE_LOOKUP = {
-    bool: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems'),
+    boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems'),
     number: ('minimum', 'maximum', 'multipleOf', 'minItems', 'maxItems')
 }
 
@@ -56,6 +60,7 @@ def _process_path(fsm_obj, **kwargs):
 
 def _get_real_value(name, value):
     dtype = _lookup_type_of(name)
+
     return dtype(value)
 
 
