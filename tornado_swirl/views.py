@@ -109,7 +109,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def __get_params(self, path_spec):
         params = []
-        print(path_spec.path_params.values())
         allps = sorted(path_spec.path_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.header_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.query_params.values(), key=lambda x: x.order) + \

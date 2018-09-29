@@ -40,7 +40,7 @@ S_SECTION = 5
 
 def _get_header_type(section_header):
     #returns header type and some info
-    print(section_header)
+    #print(section_header)
     for (name, (regex, _)) in _HEADERS_REGEX.items():
         matcher = regex.match(str(section_header))
         if matcher:
@@ -63,10 +63,10 @@ def transition_section(fsm_obj):
 
 
 def transition_process_buffer(fsm_obj):
-    print("Processing buffer")
+    #print("Processing buffer")
     #get cur header type
     htype, params = _get_header_type(fsm_obj._cur_header)
-    print("Header type: ", htype)
+    #print("Header type: ", htype)
     _, processor = _HEADERS_REGEX.get(htype, (None, None))
 
     #process the buffer
@@ -86,7 +86,7 @@ def transition_process_buffer_new_section(fsm_obj):
 
 def transition_summary(fsm_obj):
     fsm_obj.path_spec.summary = fsm_obj._buffer
-    print("Got summary: ", fsm_obj.path_spec.summary)
+    #print("Got summary: ", fsm_obj.path_spec.summary)
     fsm_obj._buffer = ""
 
 
@@ -113,21 +113,21 @@ def is_generic_line(line):
     if is_end(line):
         return False
 
-    print("Detected generic line")
+    #print("Detected generic line")
     return True 
 
 def is_end(line):
     return line.strip() == "--THE END--"
 
 def is_blank_line(line):
-    print("Detected blank" if line.strip == "" else "")
+    #print("Detected blank" if line.strip == "" else "")
     return line.strip() == ""
 
 def is_generic_line_or_blank(line):
     return is_generic_line(line) or is_blank_line(line)
 
 def is_section_header(line):
-    print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
+    #print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
     return True if _SECTION_HEADER_REGEX.match(line.strip()) else False
 
 
@@ -194,7 +194,7 @@ class Parse_FSM:
     def iterate_re_evaluators(self, line, transition):
         condition = transition['condition']
         if condition(line):
-            print("current ", self.current_state)
+            #print("current ", self.current_state)
             self.update_state(
                 transition['dst'], transition['callback'])
             return True
@@ -202,7 +202,7 @@ class Parse_FSM:
 
     def update_state(self, new_state, callback):
         self.current_state = new_state
-        print("new state ", self.current_state)
+        #print("new state ", self.current_state)
         callback(self)
 
 

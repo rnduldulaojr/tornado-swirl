@@ -34,9 +34,15 @@ def restapi(url, **kwargs):
     return _real_decorator
 
 
-def model(cls):
-    cls.rest_model = True
+def schema(cls):
+
     name = cls.__name__
+    doc = inspect.getdoc(cls)
+    model_spec = docparser.parse_from_docstring()
+    if model_spec:
+        cls.schema_spec = model_spec
+        schemas[name] = cls
+    return cls
     
 
 

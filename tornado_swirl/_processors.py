@@ -110,7 +110,7 @@ def _process_response(fsm_obj, **kwargs):
     for line in cleaned_lines:
         matcher = PARAM_MATCHER.match(line)
         if matcher:
-            param = Param(name=fsm_obj._cur_code,
+            param = Param(name=cur_code,
                           dtype=matcher.group('type') or 'string',
                           ptype='response',
                           description=str(matcher.group(
