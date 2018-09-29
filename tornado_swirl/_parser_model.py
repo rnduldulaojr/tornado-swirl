@@ -9,14 +9,15 @@ class PathSpec(object):
         self.form_params = {}
         self.cookie_params = {}
         self.responses = {}
-
+        self.properties = {}
+        
 
 class SchemaSpec(object):
-    pass
-
-
-
-
+    def __init__(self):
+        self.name = ""
+        self.summary = ""
+        self.description = ""
+        self.properties = {}
 
 class Param(object):
     def __init__(self, name, dtype='string', ptype='path', required=False, description=None, order=0):

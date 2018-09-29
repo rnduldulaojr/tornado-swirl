@@ -47,7 +47,7 @@ Errors:
 ## Installation
 TODO:
 
-## Documenting your Handlers
+## Documenting your Handlers and Models/Schemas
 
 Swirl uses the ```restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs.
 
@@ -70,8 +70,20 @@ class ItemHandler(tornado.web.RequestHandler):
         """
         pass
 
-# Then you use swagger.Application instead of tornado.web.Application
-# and do other operations as usual
+@schema
+class User(object):
+    """This is the user class
+
+    Your usual long description.
+
+    Properties:
+        name (string) -- required.  Name of user
+        age (int) -- Age of user
+
+    """
+    pass
+    
+
 
 def make_app():
     return swirl.Application(api_routes())

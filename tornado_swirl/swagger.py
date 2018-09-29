@@ -4,7 +4,7 @@ from functools import wraps
 from tornado_swirl import docparser
 import tornado.web
 from tornado_swirl.handlers import swagger_handlers
-from tornado_swirl.settings import add_api_handler, add_route
+from tornado_swirl.settings import add_api_handler, add_route, add_schema
 
 import inspect
 from tornado_swirl import docparser
@@ -38,10 +38,10 @@ def schema(cls):
 
     name = cls.__name__
     doc = inspect.getdoc(cls)
-    model_spec = docparser.parse_from_docstring()
+    model_spec = docparser.parse_from_docstring(doc, spec='schema')
     if model_spec:
         cls.schema_spec = model_spec
-        schemas[name] = cls
+        add_schema(name, cls)
     return cls
     
 

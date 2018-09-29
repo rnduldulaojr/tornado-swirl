@@ -1,6 +1,6 @@
 import re
 import tornado_swirl._processors as procs
-from tornado_swirl._parser_model import PathSpec
+from tornado_swirl._parser_model import PathSpec, SchemaSpec
 
 
 _QUERY_HEADERS = 'query headers'
@@ -10,6 +10,7 @@ _COOKIE_HEADERS = 'cookies'
 _HEADER_HEADERS = 'headers'
 _ERROR_HEADERS = 'errors'
 _RESPONSE_HEADERS = 'responses'
+_PROPERTY_HEADERS = 'properties'
 
 # Header regexes, buffer processor func
 _HEADERS = {
@@ -20,7 +21,8 @@ _HEADERS = {
     _HEADER_HEADERS: (r"(http\s*)?header(s)?:", procs._process_header),
     _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):", procs._process_errors),
     _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", procs._process_response),
-}
+    _PROPERTY_HEADERS: (r"(propert(y|ies):)", procs._process_properties),
+} 
 
 _HEADERS_REGEX = { key: (re.compile("^"+val+"$", re.IGNORECASE), processor) for (key, (val, processor)) in _HEADERS.items()}
 _ALL_HEADERS = '|'.join([ rs for (rs, _) in _HEADERS.values()])
@@ -85,13 +87,12 @@ def transition_process_buffer_new_section(fsm_obj):
 
 
 def transition_summary(fsm_obj):
-    fsm_obj.path_spec.summary = fsm_obj._buffer
-    #print("Got summary: ", fsm_obj.path_spec.summary)
+    fsm_obj.spec.summary = fsm_obj._buffer
     fsm_obj._buffer = ""
 
 
 def transition_description(fsm_obj):
-    fsm_obj.path_spec.description += fsm_obj._buffer
+    fsm_obj.spec.description += fsm_obj._buffer
     fsm_obj._buffer = ""
 
 
@@ -139,8 +140,7 @@ FSM_MAP = (
     {'src': S_SUMMARY, 'dst': S_BLANK,
         'condition': is_blank_line, 'callback': transition_summary},
     {'src': S_SUMMARY, 'dst': S_END,
-        'condition': is_end, 'callback': transition_summary},
-    
+        'condition': is_end, 'callback': transition_summary},  
     {'src': S_BLANK, 'dst': S_DESCRIPTION, 'condition': is_generic_line,
         'callback': transition_buffer},
     {'src': S_DESCRIPTION, 'dst': S_DESCRIPTION,
@@ -161,21 +161,27 @@ FSM_MAP = (
     {'src': S_START, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
     {'src': S_BLANK, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
     {'src': S_DESCRIPTION, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
- 
-
 )
+
+FSM_MAP_SCHEMA = {
+
+}
 
 
 class Parse_FSM:
 
-    def __init__(self, lines):
+    def __init__(self, fsm_map,  lines, spec='operation'):
         self.input_lines = lines + ["--THE END--"]
         self.current_state = S_START
         self.current_line = None
-        self.path_spec = PathSpec()
+        if spec == 'operation':
+            self.spec = PathSpec()
+        else:
+            self.spec = SchemaSpec()
         self._buffer = ''
         self._cur_code = None
         self._cur_header = None
+        self.fsm_map = fsm_map
 
     def run(self):
         for c in self.input_lines:
@@ -206,9 +212,12 @@ class Parse_FSM:
         callback(self)
 
 
-def parse_from_docstring(docstring: str) -> PathSpec:
+def parse_from_docstring(docstring: str, spec='operation'):
     # preprocess lines
     lines = docstring.splitlines(keepends=True)
-    p = Parse_FSM(lines)
+    p = Parse_FSM(FSM_MAP, lines, spec)
     p.run()
-    return p.path_spec
+    return p.spec
+
+
+

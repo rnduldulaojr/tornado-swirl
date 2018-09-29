@@ -42,5 +42,10 @@ def api_routes():
 def get_schemas() -> dict:
     return _SCHEMAS
 
+def is_defined_schema(name):
+    global _SCHEMAS
+    return True if _SCHEMAS.get(name) else False
+
 def add_schema(name, cls):
+    global _SCHEMAS
     _SCHEMAS[name] = cls

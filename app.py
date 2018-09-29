@@ -1,4 +1,4 @@
-from tornado_swirl.swagger import restapi, Application
+from tornado_swirl.swagger import restapi, schema, Application
 from tornado_swirl import api_routes
 import tornado.web
 import tornado.ioloop
@@ -37,7 +37,10 @@ class TestHandler(tornado.web.RequestHandler):
             date (date) -- test
 
         200 Response:
-            test (string) -- Test data
+            test ([User]) -- Test data
+        
+        201 Response:
+            test (User) -- Test user
         
         Error Response:
             400  -- Fudge
@@ -56,6 +59,18 @@ class ItemHandler(tornado.web.RequestHandler):
             itemid (integer) -- The item id
         """
         pass
+
+@schema
+class User(object):
+    """User 
+
+    User def
+
+    Properties:
+        name (string) -- required. The name
+        age (int) -- The age.
+    """
+    pass
 
 def make_app():
     return Application(api_routes(), autoreload=True)

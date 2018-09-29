@@ -338,3 +338,18 @@ def test_docstring_test():
     assert path_spec.responses
     assert path_spec.responses.get('200')
     assert path_spec.responses.get('400')
+
+def test_schema_properties():
+    docstring = """Test schema
+
+    This is something
+
+    Properties:
+        name (string) -- required.  The name.
+        age (int) -- The age.
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    assert path_spec.properties
+
+    assert path_spec.properties.get('name')

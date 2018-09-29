@@ -24,7 +24,7 @@ def _process_path(fsm_obj, **kwargs):
                       required=True,
                       order=i
                       )
-        fsm_obj.path_spec.path_params[param.name] = param
+        fsm_obj.spec.path_params[param.name] = param
     fsm_obj._buffer = ""
 
 
@@ -44,7 +44,7 @@ def _process_query(fsm_obj, **kwargs):
                                    ).lower() == "required",
                       description=str(matcher.group('description')).strip()
                       )
-        fsm_obj.path_spec.query_params[param.name] = param
+        fsm_obj.spec.query_params[param.name] = param
     fsm_obj._buffer = ""
 
 
@@ -62,7 +62,7 @@ def _process_body(fsm_obj, **kwargs):
                             str(matcher.group('required')).lower() == "optional"),
                       description=str(matcher.group('description')).strip()
                       )
-        fsm_obj.path_spec.body_param = param
+        fsm_obj.spec.body_param = param
     fsm_obj._buffer = ""
 
 
@@ -81,7 +81,7 @@ def _process_cookie(fsm_obj, **kwargs):
                           description=str(matcher.group(
                                 'description')).strip()
                           )
-            fsm_obj.path_spec.cookie_params[param.name] = param
+            fsm_obj.spec.cookie_params[param.name] = param
     fsm_obj._buffer = ""
 
 
@@ -99,8 +99,7 @@ def _process_header(fsm_obj):
                                    ).lower() == "required",
                       description=str(matcher.group('description')).strip()
                       )
-        fsm_obj.path_spec.header_params[param.name] = param
-
+        fsm_obj.spec.header_params[param.name] = param
 
 
 def _process_response(fsm_obj, **kwargs):
@@ -116,7 +115,26 @@ def _process_response(fsm_obj, **kwargs):
                           description=str(matcher.group(
                               'description')).strip()
                           )
-            fsm_obj.path_spec.responses[cur_code] = param
+            fsm_obj.spec.responses[cur_code] = param
+    fsm_obj._buffer = ""
+
+
+def _process_properties(fsm_obj, **kwargs):
+    lines = fsm_obj._buffer.splitlines()
+    cleaned_lines = _clean_lines(lines)
+
+    for line in cleaned_lines:
+        matcher = PARAM_MATCHER.match(line)
+        if matcher:
+            param = Param(name=matcher.group('name'),
+                          dtype=matcher.group('type') or 'string',
+                          ptype='property',
+                          description=str(matcher.group(
+                              'description')).strip(),
+                          required=str(matcher.group('required')
+                                       ).lower() == "required",
+                          )
+            fsm_obj.spec.properties[param.name] = param
     fsm_obj._buffer = ""
 
 
@@ -129,9 +147,10 @@ def _process_errors(fsm_obj, **kwargs):
         if matcher:
             param = Param(name=matcher.group('code'), dtype=None,
                           description=matcher.group('description'), ptype='response')
-            fsm_obj.path_spec.responses[matcher.group('code')] = param
+            fsm_obj.spec.responses[matcher.group('code')] = param
 
     fsm_obj._buffer = ""
+
 
 def _clean_lines(lines: []):
     cleaned_lines, lines = [lines[0].strip()], lines[1:]

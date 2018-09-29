@@ -5,7 +5,7 @@ import inspect
 import tornado.web
 import tornado.template
 from tornado.util import re_unescape
-from .settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC, api_routes
+from .settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC, api_routes, get_schemas, is_defined_schema
 import json
 import re
 
@@ -74,26 +74,52 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             'schemes': ["http", "https"],
             'consumes': ['application/json'],
             'produces': ['application/json'],
-            'paths': {path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis}
+            'paths': {path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis},
         }
+
+        schemas = get_schemas()
+        
+        if schemas:
+            specs.update(
+                {
+                    "components": {
+                        "schemas": {
+                            name: self.__get_schema_spec(schemaCls) for (name, schemaCls) in schemas.items()
+                        }
+
+                    }
+                }
+            )
         
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
-    def __get_models_spec(self, models):
-        models_spec = {}
-        for model in models:
-            models_spec.setdefault(model.id, self.__get_model_spec(model))
-        return models_spec
+    def __get_schema_spec(self, cls):
+        spec = cls.schema_spec
+        props = [(prop.name, self._prop_to_dict(prop), prop.required) for (_, prop) in spec.properties.items()]
+        required = [name for name, _, req in props if req]
 
-    @staticmethod
-    def __get_model_spec(model):
-        return {
-            'description': model.summary,
-            'id': model.id,
-            'notes': model.notes,
-            'properties': model.properties,
-            'required': model.required
+        val = {
+            "type": "object",
         }
+
+        if required:
+            val.update({
+                "required": required
+            })
+
+        val.update({
+            "properties": {
+                name: d for name, d, r in props
+            } 
+        })
+
+        return val
+
+   
+    def _prop_to_dict(self, prop):
+        return self.__get_type(prop)['schema']
+            
+
 
     def __get_api_spec(self, path, spec, operations):
         return{
@@ -150,15 +176,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 return {"application/json": {
                     "schema": {
                         "type": "array",
-                        "items": param.itype #TODO: apply refs 
+                        "items": self.__get_real_type(param.itype)["schema"] #TODO: apply refs 
                     }}
                 }
             
-            return {"application/json": {
-                "schema": {
-                    "type": param.type #TODO: apply type
-                }
-            }}
+            return {"application/json": self.__get_real_type(param.type)}
         #TODO: other media types
         return {
             "text/plain": {
@@ -210,7 +232,13 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             return {"schema": {
                 "type": "boolean"
             }}
-
+        
+        if is_defined_schema(typestr):
+            return {"schema": {
+                "$ref": "#/components/schemas/" + typestr
+            }
+            
+            }
         return {"schema": {
             "type": typestr
         }}
@@ -221,7 +249,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             return {"schema": {
                         "type": "array",
                         "items": {
-                            "type": param.itype
+                            "type": param.itype #TODO detect type
                         }
             }
             }
