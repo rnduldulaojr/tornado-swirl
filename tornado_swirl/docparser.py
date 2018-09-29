@@ -38,6 +38,7 @@ S_END = 3
 S_BLANK = 4
 S_SECTION = 5
 
+
 # transitions
 
 def _get_header_type(section_header):
@@ -63,6 +64,8 @@ def transition_buffer(fsm_obj):
 def transition_section(fsm_obj):
     fsm_obj._cur_header = fsm_obj.current_line.strip()
 
+def transition_props(fsm_obj):
+    pass
 
 def transition_process_buffer(fsm_obj):
     #print("Processing buffer")
@@ -97,12 +100,6 @@ def transition_description(fsm_obj):
 
 
 
-
-
-# transitions
-T_BLANK = transition_blank
-T_SUMMARY = transition_summary
-
 # conditions
 
 def is_generic_line(line):
@@ -116,6 +113,8 @@ def is_generic_line(line):
 
     #print("Detected generic line")
     return True 
+
+
 
 def is_end(line):
     return line.strip() == "--THE END--"

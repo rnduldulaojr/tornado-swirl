@@ -14,6 +14,7 @@ class MainHandler(tornado.web.RequestHandler):
 
         Query Params:
             param1 (integer) -- required. test
+                minimum: 1  maximum: 200
 
         Response:
             docs ([string]) -- Foomanchu
@@ -69,6 +70,7 @@ class User(object):
     Properties:
         name (string) -- required. The name
         age (int) -- The age.
+            minimum: 1  maximum: 100
     """
     pass
 

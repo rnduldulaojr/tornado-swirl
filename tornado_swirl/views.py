@@ -115,7 +115,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
    
     def _prop_to_dict(self, prop):
-        return self.__get_type(prop)['schema']
+        d = self.__get_type(prop)['schema']
+        if d is not None:
+            d.update(prop.kwargs)
+        return d
             
 
 
@@ -190,68 +193,72 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         
         
 
-    def __get_real_type(self, typestr):
-        if typestr in ("int", "integer"):
-            return {"schema": {
+    def __get_real_type(self, typestr, **kwargs):
+        if typestr in ("int", "integer", "int32"):
+            val =  {
                 "type": "integer",
                 "format": "int32"
-            }}
+            }
         
-        if typestr == "long":
-            return {"schema": {
+        elif typestr in ("long", "int64"):
+            val = {
                 "type": "integer",
                 "format": "int64"
-            }}
+            }
 
-        if typestr in ("float", "double"):
-            return {"schema": {
+        elif typestr in ("float", "double"):
+            val =  {
                 "type": "number",
                 "format": typestr
-            }}
+            }
 
-        if typestr in ("byte", "binary", "date", "password"):
-            return {"schema": {
+        elif typestr in ("byte", "binary", "date", "password"):
+            val = {
                 "type": "string",
                 "format": typestr
-            }}
+            }
 
-        if typestr == "dateTime":
-            return {"schema": {
+        elif typestr in ("dateTime", "date-time"):
+            val = {
                 "type": "string",
                 "format": "date-time"
-            }}
+            }
 
-        if typestr in ("str", "string"):
-            return {"schema": {
+        elif typestr in ("str", "string"):
+            val =  {
                 "type": "string"
-            }}
+            }
 
-        if typestr == "bool":
-            return {"schema": {
+        elif typestr in ("bool", "boolean"):
+            val = {
                 "type": "boolean"
-            }}
+            }
         
-        if is_defined_schema(typestr):
-            return {"schema": {
+        elif is_defined_schema(typestr):
+            val = {
                 "$ref": "#/components/schemas/" + typestr
             }
-            
+        else:    
+            val = {
+                "type": typestr
             }
-        return {"schema": {
-            "type": typestr
-        }}
+
+        val.update(kwargs)
+        return { "schema": val}
         # TODO check if typestr is a reference
 
     def __get_type(self, param):
+        print(param.kwargs)
         if param.type == "array":
             return {"schema": {
                         "type": "array",
                         "items": {
                             "type": param.itype #TODO detect type
                         }
+            }.update(param.kwargs)
             }
-            }
-        real_type = self.__get_real_type(param.type)
+        real_type = self.__get_real_type(str(param.type).strip(), **param.kwargs)
+        print("returned", real_type)
         return real_type
 
     @staticmethod

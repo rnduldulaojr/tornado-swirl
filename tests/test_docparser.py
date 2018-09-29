@@ -353,3 +353,25 @@ def test_schema_properties():
     assert path_spec.properties
 
     assert path_spec.properties.get('name')
+
+
+def test_param_props():
+    docstring = """Test schema
+
+    This is something
+
+    Properties:
+        name (string) -- required.  The name.
+        age (int) -- The age.
+            minimum: 1
+            maximum: 200
+
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    assert path_spec.properties
+
+    assert path_spec.properties.get('name')
+    assert path_spec.properties.get('age')
+    assert path_spec.properties.get('age').description.strip() == 'The age.'
+    assert path_spec.properties.get('age').kwargs.get('minimum') == 1

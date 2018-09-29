@@ -7,6 +7,7 @@ with open('README') as file:
     long_description = file.read()
 
 setup(name='tornado-swirl',
+      python_requires='>=3.7.0',
       version='0.1',
       url='https://github.com/rduldulao/tornado-swirl',
       zip_safe=False,

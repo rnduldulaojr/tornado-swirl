@@ -10,7 +10,7 @@ class PathSpec(object):
         self.cookie_params = {}
         self.responses = {}
         self.properties = {}
-        
+
 
 class SchemaSpec(object):
     def __init__(self):
@@ -28,6 +28,7 @@ class Param(object):
         self.description = description
         self.order = order
         self.itype = None
+        self.kwargs = {}
         if self.type and self.type.strip().startswith('[') and self.type.strip().endswith(']'):
             self.itype = self.type.strip()[1:-1]
             self.type = "array"
