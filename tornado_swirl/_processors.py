@@ -4,7 +4,7 @@ from ._parser_model import Param
 import numbers
 
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?"
+QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, \[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX,  re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX,  re.IGNORECASE)
@@ -212,11 +212,11 @@ def _process_errors(fsm_obj, **kwargs):
     cleaned_lines = _clean_lines(lines)
 
     for line in cleaned_lines:
-        matcher = ERRORSPEC_MATCHER.match(line)
+        matcher = PARAM_MATCHER.match(line)
         if matcher:
-            param = Param(name=matcher.group('code'), dtype=None,
+            param = Param(name=matcher.group('name'), dtype=matcher.group('type') or '',
                           description=matcher.group('description'), ptype='response')
-            fsm_obj.spec.responses[matcher.group('code')] = param
+            fsm_obj.spec.responses[matcher.group('name')] = param
 
     fsm_obj._buffer = ""
 

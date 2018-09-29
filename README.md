@@ -10,6 +10,13 @@ Parameters(query, path, cookie, header, request body) need to be specified in th
 name (type) -- (required?) description
 ```
 
+OR they can have OpenAPI 3.0 schema properties:
+
+```
+age (int) -- (optional) Age of person.
+    minimum: 0  maximum: 150
+```
+
 ```type``` and ```required```  (which can be "Required." or "Optional.") as well as ```description``` can be optional.  
 
 ### Example docstring:

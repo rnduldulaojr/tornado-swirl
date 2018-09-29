@@ -248,7 +248,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         # TODO check if typestr is a reference
 
     def __get_type(self, param):
-        print(param.kwargs)
         if param.type == "array":
             return {"schema": {
                         "type": "array",
@@ -257,8 +256,13 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                         }
             }.update(param.kwargs)
             }
+        if isinstance(param.itype, dict):
+            val =  {
+                "type": param.type
+            }
+            val.update(param.itype)
+            return {"schema" : val }
         real_type = self.__get_real_type(str(param.type).strip(), **param.kwargs)
-        print("returned", real_type)
         return real_type
 
     @staticmethod

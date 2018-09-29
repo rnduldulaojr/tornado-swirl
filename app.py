@@ -17,7 +17,7 @@ class MainHandler(tornado.web.RequestHandler):
                 minimum: 1  maximum: 200  exclusiveMaximum: true
 
         Response:
-            docs ([string]) -- Foomanchu
+            x (enum[a,b,c]) -- Foomanchu
         """
         self.finish()
 
@@ -35,7 +35,7 @@ class TestHandler(tornado.web.RequestHandler):
 
         Path Params:
             emp_uid (int) -- test
-            date (date) -- test
+            date (enum[a,b,c]) -- test
 
         200 Response:
             test ([User]) -- Test data

@@ -22,16 +22,24 @@ class SchemaSpec(object):
 class Param(object):
     def __init__(self, name, dtype='string', ptype='path', required=False, description=None, order=0):
         self.name = name
-        self.type = dtype
+        self.type = dtype.strip()
         self.ptype = ptype
         self.required = required
         self.description = description
         self.order = order
         self.itype = None
         self.kwargs = {}
-        if self.type and self.type.strip().startswith('[') and self.type.strip().endswith(']'):
-            self.itype = self.type.strip()[1:-1]
+        if self.type and self.type.startswith('[') and self.type.endswith(']'):
+            self.itype = self.type[1:-1]
             self.type = "array"
+
+        if self.type and self.type.startswith('enum[') and self.type.endswith(']'):
+            content = [c.strip() for c in self.type[self.type.find('[')+1:self.type.rfind(']')].split(',')]
+
+            self.itype = {
+                "enum": content
+            }
+            self.type = "string"
 
     def is_model_type(self):
         # TODO: connect with models lookup
