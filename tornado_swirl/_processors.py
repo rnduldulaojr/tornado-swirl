@@ -42,20 +42,35 @@ def _lookup_type_of(name):
             return t
     return str
 
-def _process_path(fsm_obj, **kwargs):
+def _process_params(fsm_obj, ptype, required_func=None):
+    # get buffer and conver
+    # first merge lines without -- to previous lines
+    if required_func is None:
+        required_func = lambda x,y: x == y 
+
     lines = fsm_obj._buffer.splitlines()
     cleaned_lines = _clean_lines(lines)
-    for i, line in enumerate(cleaned_lines, start=1):
-        matcher = re.match(QUERYSPEC_REGEX, line, re.IGNORECASE)
+    params = {}
+    # parse the lines
+    for i, line in enumerate(cleaned_lines):
+        matcher = re.match(QUERYSPEC_REGEX, line.lstrip(), re.IGNORECASE)
         param = Param(name=matcher.group('name'),
                       dtype=matcher.group('type') or 'string',
-                      ptype="path",
-                      description=str(matcher.group(
-                            'description')).strip(),
-                      required=True,
-                      order=i
+                      ptype=ptype,
+                      required=required_func(str(matcher.group('required')
+                                   ).lower(), "required"),
+                      order = i,
                       )
-        fsm_obj.spec.path_params[param.name] = param
+        description=str(matcher.group('description')).strip()
+        desc, kwargs = _get_description_props(description)
+        param.description = desc.strip()
+        param.kwargs = kwargs
+        params[param.name] = param
+    return params
+
+
+def _process_path(fsm_obj, **kwargs):
+    fsm_obj.spec.path_params = _process_params(fsm_obj, "path", lambda x,y: True)
     fsm_obj._buffer = ""
 
 def _get_real_value(name, value):
@@ -81,88 +96,27 @@ def _get_description_props(description:str):
 
 
 def _process_query(fsm_obj, **kwargs):
-    # get buffer and conver
-           # first merge lines without -- to previous lines
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-
-    # parse the lines
-    for line in cleaned_lines:
-        matcher = re.match(QUERYSPEC_REGEX, line.lstrip(), re.IGNORECASE)
-        param = Param(name=matcher.group('name'),
-                      dtype=matcher.group('type') or 'string',
-                      ptype="query",
-                      required=str(matcher.group('required')
-                                   ).lower() == "required",
-                      )
-        description=str(matcher.group('description')).strip()
-        desc, kwargs = _get_description_props(description)
-        param.description = desc.strip()
-        param.kwargs = kwargs
-        fsm_obj.spec.query_params[param.name] = param
+    fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
     fsm_obj._buffer = ""
 
 
 def _process_body(fsm_obj, **kwargs):
     # first merge lines without -- to previous lines
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-    if cleaned_lines:
-        line = cleaned_lines[0]  # get the first one only
-        matcher = re.match(QUERYSPEC_REGEX, line, re.IGNORECASE)
-        param = Param(name=matcher.group('name'),
-                      dtype=matcher.group('type') or 'string',
-                      ptype="body",
-                      required=not (
-                            str(matcher.group('required')).lower() == "optional"),
-                      )
-        description=str(matcher.group('description')).strip()
-        desc, kwargs = _get_description_props(description)
-        param.description = desc.strip()
-        param.kwargs = kwargs
-        fsm_obj.spec.body_param = param
+    #TODO: change this
+    params = _process_params(fsm_obj, "body", lambda x,y: True)
+    if params:
+        fsm_obj.spec.body_param = list(params.values())[0]
     fsm_obj._buffer = ""
 
 
 def _process_cookie(fsm_obj, **kwargs):
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-
-    for line in cleaned_lines:
-        matcher = PARAM_MATCHER.match(line)
-        if matcher:
-            param = Param(name=matcher.group('name'),
-                          dtype=matcher.group('type') or 'string',
-                          ptype="cookie",
-                          required=str(matcher.group('required')
-                                       ).lower() == "required",
-                          )
-            description=str(matcher.group('description')).strip()
-            desc, kwargs = _get_description_props(description)
-            param.description = desc.strip()
-            param.kwargs = kwargs
-            fsm_obj.spec.cookie_params[param.name] = param
+    fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie")
     fsm_obj._buffer = ""
 
 
 def _process_header(fsm_obj):
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-
-    # parse the lines
-    for line in cleaned_lines:
-        matcher = re.match(QUERYSPEC_REGEX, line, re.IGNORECASE)
-        param = Param(name=matcher.group('name'),
-                      dtype=matcher.group('type') or 'string',
-                      ptype="header",
-                      required=str(matcher.group('required')
-                                   ).lower() == "required",
-                      )
-        description=str(matcher.group('description')).strip()
-        desc, kwargs = _get_description_props(description)
-        param.description = desc.strip()
-        param.kwargs = kwargs
-        fsm_obj.spec.header_params[param.name] = param
+    fsm_obj.spec.header_params = _process_params(fsm_obj, "header")
+    fsm_obj._buffer = ""
 
 
 def _process_response(fsm_obj, **kwargs):
