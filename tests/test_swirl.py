@@ -39,3 +39,10 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['paths']
         assert obj['paths']['/test']
         assert obj['paths']['/test']['get']
+
+        obj = obj['paths']['/test']['get']
+        assert obj['responses']
+        assert obj['responses']['200']
+        assert obj['responses']['200']['description'] == 'An output.'
+        assert obj['responses']['200']['content']['text/plain']['schema']
+        assert obj['responses']['200']['content']['text/plain']['schema']['type'] == 'string'
