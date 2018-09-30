@@ -45,9 +45,7 @@ def schema(cls):
     return cls
     
 
-
-
 class Application(tornado.web.Application):
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):
-        super(Application, self).__init__(swagger_handlers() +
-                                          handlers, default_host, transforms, **settings)
+        super(Application, self).__init__((swagger_handlers() +
+                                          handlers) if handlers else swagger_handlers(), default_host, transforms, **settings)

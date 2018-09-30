@@ -27,7 +27,7 @@ class number(numbers.Number):
 
 class boolean(object):
     def __new__(cls, val):
-        return val in ('True', 'true', '1')
+        return val in ('True', 'true', '1', True)
                    
         
 
