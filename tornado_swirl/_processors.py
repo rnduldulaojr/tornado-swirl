@@ -4,7 +4,7 @@ from ._parser_model import Param
 import numbers
 
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, \[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?"
+QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, \[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX,  re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX,  re.IGNORECASE)
@@ -53,7 +53,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
     params = {}
     # parse the lines
     for i, line in enumerate(cleaned_lines):
-        matcher = re.match(QUERYSPEC_REGEX, line.lstrip(), re.IGNORECASE)
+        matcher = PARAM_MATCHER.match(line.lstrip())
         param = Param(name=matcher.group('name'),
                       dtype=matcher.group('type') or 'string',
                       ptype=ptype,
@@ -114,7 +114,7 @@ def _process_cookie(fsm_obj, **kwargs):
     fsm_obj._buffer = ""
 
 
-def _process_header(fsm_obj):
+def _process_header(fsm_obj, **kwargs):
     fsm_obj.spec.header_params = _process_params(fsm_obj, "header")
     fsm_obj._buffer = ""
 
@@ -123,55 +123,24 @@ def _process_response(fsm_obj, **kwargs):
     lines = fsm_obj._buffer.splitlines()
     cleaned_lines = _clean_lines(lines)
     cur_code = kwargs.get('code', '200')
-    for line in cleaned_lines:
-        matcher = PARAM_MATCHER.match(line)
-        if matcher:
-            param = Param(name=cur_code,
-                          dtype=matcher.group('type') or 'string',
-                          ptype='response',
-                          description=str(matcher.group(
-                              'description')).strip()
-                          )
-            description=str(matcher.group('description')).strip()
-            desc, kwargs = _get_description_props(description)
-            param.description = desc.strip()
-            param.kwargs = kwargs
-            fsm_obj.spec.responses[cur_code] = param
+    print("Cur_code: ", cur_code )
+    res = _process_params(fsm_obj, "response")
+    if res:
+        item = list(res.values())[0]
+        item.name = cur_code
+        fsm_obj.spec.responses.update({
+            cur_code: item
+        })
     fsm_obj._buffer = ""
 
 
 def _process_properties(fsm_obj, **kwargs):
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-
-    for line in cleaned_lines:
-        matcher = PARAM_MATCHER.match(line)
-        if matcher:
-            param = Param(name=matcher.group('name'),
-                          dtype=matcher.group('type') or 'string',
-                          ptype='property',
-                          required=str(matcher.group('required')
-                                       ).lower() == "required",
-                          )
-            description=str(matcher.group('description')).strip()
-            desc, kwargs = _get_description_props(description)
-            param.description = desc.strip()
-            param.kwargs = kwargs
-            fsm_obj.spec.properties[param.name] = param
+    fsm_obj.spec.properties = _process_params(fsm_obj, "property")
     fsm_obj._buffer = ""
 
 
 def _process_errors(fsm_obj, **kwargs):
-    lines = fsm_obj._buffer.splitlines()
-    cleaned_lines = _clean_lines(lines)
-
-    for line in cleaned_lines:
-        matcher = PARAM_MATCHER.match(line)
-        if matcher:
-            param = Param(name=matcher.group('name'), dtype=matcher.group('type') or '',
-                          description=matcher.group('description'), ptype='response')
-            fsm_obj.spec.responses[matcher.group('name')] = param
-
+    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
     fsm_obj._buffer = ""
 
 

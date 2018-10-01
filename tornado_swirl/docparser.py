@@ -98,8 +98,6 @@ def transition_description(fsm_obj):
     fsm_obj.spec.description += fsm_obj._buffer
     fsm_obj._buffer = ""
 
-
-
 # conditions
 
 def is_generic_line(line):
@@ -113,7 +111,6 @@ def is_generic_line(line):
 
     #print("Detected generic line")
     return True 
-
 
 
 def is_end(line):
