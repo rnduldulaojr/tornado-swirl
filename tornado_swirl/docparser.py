@@ -22,6 +22,7 @@ _HEADERS = {
     _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):", procs._process_errors),
     _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", procs._process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", procs._process_properties),
+    
 }
 
 _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)

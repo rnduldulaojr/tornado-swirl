@@ -61,6 +61,75 @@ class ItemHandler(tornado.web.RequestHandler):
         """
         pass
 
+@restapi('/withrequestbody')
+class FooHandler(tornado.web.RequestHandler):
+
+    def get(self, itemid):
+        """Get Item data.
+
+        Gets Item data from database.
+
+        Request Body:
+            itemid (integer) -- The item id
+        """
+        pass
+
+
+@restapi('/withrequestbody2')
+class FooHandler2(tornado.web.RequestHandler):
+
+    def get(self, itemid):
+        """Get Item data.
+
+        Gets Item data from database.
+
+        Request Body:
+            file (file:text/csv) -- CSV file.
+        """
+        pass
+
+@restapi('/withrequestbody3')
+class FooHandler3(tornado.web.RequestHandler):
+
+    def get(self, itemid):
+        """Get Item data.
+
+        Gets Item data from database.
+
+        Request Body:
+            file (file:text/csv) -- CSV file.
+            name (string) -- required. Foo name.
+        """
+        pass
+
+@restapi('/withrequestbody4')
+class FooHandler4(tornado.web.RequestHandler):
+
+    def get(self, itemid):
+        """Get Item data.
+
+        Gets Item data from database.
+
+        Request Body:
+            file (file:text/csv) -- CSV file.
+            name (string) -- required. Foo name.
+            user (User) -- required. User data.
+        """
+        pass
+
+@restapi('/withrequestbody5')
+class FooHandler5(tornado.web.RequestHandler):
+
+    def get(self, itemid):
+        """Get Item data.
+
+        Gets Item data from database.
+
+        Request Body:
+            user (User) -- required. User data.
+        """
+        pass
+
 @schema
 class User(object):
     """User 

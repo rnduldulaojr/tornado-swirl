@@ -123,12 +123,9 @@ Request Body:
     assert qp2.required
     assert qp2.description == "The param 2."
 
-    body_param = path_spec.body_param
-    assert body_param is not None
-    assert body_param.name == "test"
-    assert body_param.type == "Model"
-    assert body_param.required
-    assert body_param.description == "This is the bomb."
+    body_params = path_spec.body_params
+    assert body_params is not None
+    
 
 
 def test_simple_parse_6_with_body_params_and_headers():
@@ -168,13 +165,9 @@ Request Body:
     assert qp2.required
     assert qp2.description == "The param 2."
 
-    body_param = path_spec.body_param
-    assert body_param is not None
-    assert body_param.name == "test"
-    assert body_param.type == "Model"
-    assert body_param.required
-    assert body_param.description == "This is the bomb."
-
+    body_params = path_spec.body_params
+    assert body_params is not None
+  
     hp = path_spec.header_params.get("Authorization")
     assert hp is not None
     assert hp.name == "Authorization"
@@ -218,12 +211,9 @@ Request Body:
     assert qp2.required
     assert qp2.description == "The param 2."
 
-    body_param = path_spec.body_param
-    assert body_param is not None
-    assert body_param.name == "test"
-    assert body_param.type == "Model"
-    assert body_param.required
-    assert body_param.description == "This is the bomb."
+    body_params = path_spec.body_params
+    assert body_params is not None
+    
 
     hp = path_spec.header_params.get("Authorization")
     assert hp is not None

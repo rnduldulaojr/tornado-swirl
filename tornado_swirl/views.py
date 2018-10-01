@@ -123,23 +123,34 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return d
 
     def __get_api_spec(self, path, spec, operations):
-        return{
-            api[0]: {
+        paths = {}
+        for api in operations:
+            paths[api[0]] = {
                 'operationId': str(spec.__name__) + "." + api[0],
                 'summary': api[1].summary.strip(),
                 'description': api[1].description.strip(),
                 'parameters': self.__get_params(api[1]),
-                'responses': self.__get_responses(api[1])
+            }
+            print("Body Params: ", api[1].body_params)
+            if api[1].body_params:
+                paths[api[0]]["requestBody"] = self.__get_request_body(api[1])
 
-            } for api in operations
-        }
+            paths[api[0]]["responses"] = self.__get_responses(api[1])
+        return paths
+        
+    def __detect_content_from_type(self, val) -> (str, bool, str):
+        if val.type == "file":
+            return "file", False, val.itype
+        if val.type in get_schemas().keys():
+            return val.type, True, None
+    
+        return val.type, False, None
 
     def __get_params(self, path_spec):
         params = []
         allps = sorted(path_spec.path_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.header_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.query_params.values(), key=lambda x: x.order) + \
-            sorted(path_spec.form_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.cookie_params.values(),
                    key=lambda x: x.order)  # + \
         # [path_spec.body_param] body param
@@ -153,8 +164,63 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
                 param_data.update(self.__get_type(param))
                 params.append(param_data)
+        return params    
 
-        return params
+    def __get_request_body(self, path_spec):
+        contents = {}
+        if path_spec.body_params:
+            files_detected = 0  #content = file:xxxx default text/plain
+            form_data_detected = 0 #application/x-www-form-urlencoded
+            models_detected = 0 #application/json or application/xml
+
+            for (name, val) in path_spec.body_params.items():
+                content, ismodel, ftype = self.__detect_content_from_type(val)
+                print(content, ismodel, ftype)
+                if ftype is not None:
+                    files_detected += 1
+                elif ismodel:
+                    models_detected += 1
+                else:
+                    form_data_detected += 1
+
+            ctype = ''
+            if form_data_detected > 0 and not files_detected and not models_detected:
+                ctype = 'application/x-www-form-urlencoded'
+                contents[ctype] = {
+                    "schema": {
+                        "properties": {
+                            spec.name: self.__get_real_type(spec.type)['schema'] for spec in path_spec.body_params.values()
+                        }
+                    }
+                }
+            elif files_detected == 1 and not form_data_detected and not models_detected:
+                f = list(path_spec.body_params.values())[0]
+                contents[f.itype] = {
+                    "schema": {
+                        "type": "string",
+                        "format": "binary"  #TODO: When to use byte/base64?
+                    }
+                }
+            elif (files_detected > 0 and (form_data_detected > 0 or models_detected > 0)) or models_detected > 1:
+                contents["multipart/form-data"] = {
+                    "schema": {
+                        "properties": {
+                            spec.name: self.__get_real_type(spec.type)['schema'] for spec in path_spec.body_params.values()
+                        }
+                    }
+                }
+            elif models_detected == 1 and not files_detected and not form_data_detected:
+                f = list(path_spec.body_params.values())[0]
+                t = f.itype or 'application/json'
+                contents[t] = self.__get_type(f)
+            else:
+                ctype = 'Unknown'
+
+        return {"content": contents}
+            
+        
+
+       
 
     def __get_responses(self, path_spec):
         params = {}
@@ -239,6 +305,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             val = {
                 "$ref": "#/components/schemas/" + typestr
             }
+
+        elif typestr == "file":
+            val = {
+                "type": "string",
+                "format": "binary",
+            }
         else:
             val = {
                 "type": typestr
@@ -250,13 +322,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def __get_type(self, param):
         if param.type == "array":
-            return {"schema": {
-                "type": "array",
+            val =  {
+                        "type": "array",
                         "items": {
                             "type": param.itype  # TODO detect type
                         }
-            }.update(param.kwargs)
             }
+            val.update(param.kwargs)
+            return {"schema": val}
         if isinstance(param.itype, dict):
             val = {
                 "type": param.type

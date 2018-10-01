@@ -35,7 +35,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
                 Response:
                     out (string) -- An output.
                 """
-                self.finish
+                self.finish()
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
@@ -73,7 +73,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
                     400 -- Bad Request
                     404 -- Not Found
                 """
-                self.finish
+                self.finish()
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
@@ -110,7 +110,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
                     400 -- Bad Request
                     404 -- Not Found
                 """
-                self.finish
+                self.finish()
 
         @swirl.schema
         class Model(object):
@@ -135,9 +135,73 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['components']
         assert obj['components']['schemas']
         assert obj['components']['schemas']['Model']
-        
+
         obj = obj['paths']['/test/{a}/{b}']['post']
         assert obj['responses']['400']
         assert obj['responses']['404']
         
-       
+    @gen_test
+    def test_request_body_form_data(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            async def post(self, a, b):
+                """This is a simple test post with form data.
+
+                This is a simple description.
+
+                Request Body:
+                    a (string) -- The a.
+                    b (integer) -- The b
+                
+                Response:
+                    out (string) -- An output.
+
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+        print(response.body)
+        assert obj['paths']
+        assert obj['paths']['/test/form']
+        assert obj['paths']['/test/form']['post']
+        assert obj['paths']['/test/form']['post']['requestBody']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']['application/x-www-form-urlencoded']
+
+    @gen_test
+    def test_request_body_file_data(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            async def post(self, a, b):
+                """This is a simple test post with form data.
+
+                This is a simple description.
+
+                Request Body:
+                    file (file:text/csv) -- The file.
+                    
+                
+                Response:
+                    out (string) -- An output.
+
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+        print(response.body)
+        assert obj['paths']
+        assert obj['paths']['/test/form']
+        assert obj['paths']['/test/form']['post']
+        assert obj['paths']['/test/form']['post']['requestBody']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']['text/csv']

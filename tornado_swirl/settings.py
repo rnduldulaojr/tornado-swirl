@@ -55,5 +55,5 @@ def is_defined_schema(name):
 
 def add_schema(name, cls):
     """Add a schema"""
-    global _SCHEMAS
+    global _SCHEMAS 
     _SCHEMAS[name] = cls

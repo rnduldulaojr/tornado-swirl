@@ -3,8 +3,9 @@ import re
 from ._parser_model import Param
 import numbers
 
+from .settings import get_schemas
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, \[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)
@@ -77,6 +78,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
 def _process_path(fsm_obj, **kwargs):
     fsm_obj.spec.path_params = _process_params(
         fsm_obj, "path", lambda x, y: True)
+    _set_default_type(fsm_obj.spec.path_params, "string")
     fsm_obj._buffer = ""
 
 
@@ -112,14 +114,14 @@ def _process_query(fsm_obj, **kwargs):
     fsm_obj._buffer = ""
 
 
+
 def _process_body(fsm_obj, **kwargs):
     # first merge lines without -- to previous lines
     # TODO: change this
-    params = _process_params(fsm_obj, "body", lambda x, y: True)
-    if params:
-        fsm_obj.spec.body_param = list(params.values())[0]
-    fsm_obj._buffer = ""
-
+    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
+    #check the params and guess the content type
+    _set_default_type(fsm_obj.spec.body_params, "string")
+    fsm_obj._buffer = ''
 
 def _process_cookie(fsm_obj, **kwargs):
     fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie")

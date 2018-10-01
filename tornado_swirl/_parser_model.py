@@ -9,7 +9,7 @@ class PathSpec(object):
         self.description = ""
         self.query_params = {}
         self.path_params = {}
-        self.body_param = None  # there should only be one.
+        self.body_params = {}
         self.header_params = {}
         self.form_params = {}
         self.cookie_params = {}
@@ -47,7 +47,7 @@ class Param(object):
             self.itype = self.type[1:-1]
             self.type = "array"
 
-        if self.type and self.type.startswith('enum[') and self.type.endswith(']'):
+        elif self.type and self.type.startswith('enum[') and self.type.endswith(']'):
             content = [c.strip() for c in
                        self.type[self.type.find('[')+1:self.type.rfind(']')].split(',')]
 
@@ -55,3 +55,23 @@ class Param(object):
                 "enum": content
             }
             self.type = "string"
+        else:
+            colon = -1
+            if self.type:
+                colon = self.type.find(':')
+
+            if self.type and self.type.startswith('file'):
+                if colon ==  -1:
+                    self.itype = 'text/plain'
+                else:
+                    self.itype = self.type[colon+1:]
+                    colon = -1 #reset
+                self.type = "file"
+            
+
+            if colon > -1:  #for example Model:application/json or Model:application/xml
+                self.itype = self.type[colon+1:]
+                self.type = self.type[:colon]
+
+        
+
