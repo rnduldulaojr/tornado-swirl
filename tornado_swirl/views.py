@@ -11,6 +11,7 @@ import re
 
 __author__ = 'rduldulao'
 
+
 def json_dumps(obj, pretty=False):
     return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)
 
@@ -72,11 +73,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             'schemes': ["http", "https"],
             'consumes': ['application/json'],
             'produces': ['application/json'],
-            'paths': {path: self.__get_api_spec(path, spec, operations) for path, spec, operations in apis},
+            'paths': {path: self.__get_api_spec(path, spec, operations)
+                      for path, spec, operations in apis},
         }
 
         schemas = get_schemas()
-        
+
         if schemas:
             specs.update(
                 {
@@ -88,12 +90,13 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                     }
                 }
             )
-        
+
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
     def __get_schema_spec(self, cls):
         spec = cls.schema_spec
-        props = [(prop.name, self._prop_to_dict(prop), prop.required) for (_, prop) in spec.properties.items()]
+        props = [(prop.name, self._prop_to_dict(prop), prop.required)
+                 for (_, prop) in spec.properties.items()]
         required = [name for name, _, req in props if req]
 
         val = {
@@ -108,19 +111,16 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         val.update({
             "properties": {
                 name: d for name, d, r in props
-            } 
+            }
         })
 
         return val
 
-   
     def _prop_to_dict(self, prop):
         d = self.__get_type(prop)['schema']
         if d is not None:
             d.update(prop.kwargs)
         return d
-            
-
 
     def __get_api_spec(self, path, spec, operations):
         return{
@@ -130,7 +130,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 'description': api[1].description.strip(),
                 'parameters': self.__get_params(api[1]),
                 'responses': self.__get_responses(api[1])
-                
+
             } for api in operations
         }
 
@@ -140,8 +140,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             sorted(path_spec.header_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.query_params.values(), key=lambda x: x.order) + \
             sorted(path_spec.form_params.values(), key=lambda x: x.order) + \
-            sorted(path_spec.cookie_params.values(), key=lambda x: x.order) #+ \
-            #[path_spec.body_param] body param
+            sorted(path_spec.cookie_params.values(),
+                   key=lambda x: x.order)  # + \
+        # [path_spec.body_param] body param
         for param in allps:
             if param:
                 param_data = {
@@ -162,27 +163,29 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             if param:
                 params[param.name] = {
                     "description": param.description,
-                    "content": 
-                        self._detect_content(param)  #should return default produces if none, otherwise detect from type
+                    "content":
+                        # should return default produces if none, otherwise detect from type
+                        self._detect_content(param)
                 }
 
-                #TODO: implement examples
+                # TODO: implement examples
         return params
 
     def _detect_content(self, param):
-        
-        if param.type not in ('integer','int','string','str','boolean', 'bool', 'number', 'int32', 'int64',
-            'float', 'double', "byte", "binary", "date", "date-time", "password" ):
+
+        if param.type not in ('integer', 'int', 'string', 'str', 'boolean', 'bool', 'number', 'int32', 'int64',
+                              'float', 'double', "byte", "binary", "date", "date-time", "password"):
             if param.type == "array":
                 return {"application/json": {
                     "schema": {
                         "type": "array",
-                        "items": self.__get_real_type(param.itype)["schema"] #TODO: apply refs 
+                        # TODO: apply refs
+                        "items": self.__get_real_type(param.itype)["schema"]
                     }}
                 }
-            
+
             return {"application/json": self.__get_real_type(param.type)}
-        #TODO: other media types
+        # TODO: other media types
         return {
             "text/plain": {
                 "schema": {
@@ -190,16 +193,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
             }
         }
-        
-        
 
     def __get_real_type(self, typestr, **kwargs):
         if typestr in ("int", "integer", "int32"):
-            val =  {
+            val = {
                 "type": "integer",
                 "format": "int32"
             }
-        
+
         elif typestr in ("long", "int64"):
             val = {
                 "type": "integer",
@@ -207,7 +208,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             }
 
         elif typestr in ("float", "double"):
-            val =  {
+            val = {
                 "type": "number",
                 "format": typestr
             }
@@ -225,7 +226,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             }
 
         elif typestr in ("str", "string"):
-            val =  {
+            val = {
                 "type": "string"
             }
 
@@ -233,36 +234,37 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             val = {
                 "type": "boolean"
             }
-        
+
         elif is_defined_schema(typestr):
             val = {
                 "$ref": "#/components/schemas/" + typestr
             }
-        else:    
+        else:
             val = {
                 "type": typestr
             }
 
         val.update(kwargs)
-        return { "schema": val}
+        return {"schema": val}
         # TODO check if typestr is a reference
 
     def __get_type(self, param):
         if param.type == "array":
             return {"schema": {
-                        "type": "array",
+                "type": "array",
                         "items": {
-                            "type": param.itype #TODO detect type
+                            "type": param.itype  # TODO detect type
                         }
             }.update(param.kwargs)
             }
         if isinstance(param.itype, dict):
-            val =  {
+            val = {
                 "type": param.type
             }
             val.update(param.itype)
-            return {"schema" : val }
-        real_type = self.__get_real_type(str(param.type).strip(), **param.kwargs)
+            return {"schema": val}
+        real_type = self.__get_real_type(
+            str(param.type).strip(), **param.kwargs)
         return real_type
 
     @staticmethod

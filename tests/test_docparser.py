@@ -1,3 +1,4 @@
+#pylint: disable=all
 from tornado_swirl.docparser import parse_from_docstring, PathSpec
 
 

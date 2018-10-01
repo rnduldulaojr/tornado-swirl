@@ -1,16 +1,26 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-from tornado.web import URLSpec, StaticFileHandler
+"""
+Swagger handler utils
+"""
 
-from .settings import (
-    default_settings, URL_SWAGGER_API_DOCS, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC
-)
-from tornado_swirl.views import SwaggerApiHandler, SwaggerResourcesHandler, SwaggerUIHandler
+from tornado.web import StaticFileHandler, URLSpec
+
+from tornado_swirl.views import (SwaggerApiHandler, SwaggerResourcesHandler,
+                                 SwaggerUIHandler)
+
+from .settings import (URL_SWAGGER_API_DOCS, URL_SWAGGER_API_LIST,
+                       URL_SWAGGER_API_SPEC, default_settings)
 
 __author__ = 'serena'
 
 
 def swagger_handlers():
+    """Returns the swagger UI handlers
+
+    Returns:
+        [(route, handler)] -- list of Tornado URLSpec
+    """
+
     prefix = default_settings.get('swagger_prefix', '/swagger')
     if prefix[-1] != '/':
         prefix += '/'

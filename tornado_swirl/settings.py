@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Swirl Settings module."""
 import os.path
 
 __author__ = 'rduldulao'
@@ -21,31 +22,38 @@ default_settings = {
     'exclude_namespaces': [],
 }
 
-_SCHEMAS = {}
+_SCHEMAS = dict()
 
 _ROUTES = []
 
 _API_HANDLERS = []
 
 def get_api_handlers() -> list:
+    """Returns REST API handlers"""
     return _API_HANDLERS
 
 def add_api_handler(cls):
+    """Adds a REST API handler class"""
     _API_HANDLERS.append(cls)
 
 def add_route(path, handler,  **kwargs):
+    """Add a REST API route."""
     _ROUTES.append((path, handler, kwargs))
 
 def api_routes():
+    """Return all registered REST API routes via @restapi decorator"""
     return _ROUTES
 
 def get_schemas() -> dict:
+    """Return all registered REST API models via @schema decorator"""
     return _SCHEMAS
 
 def is_defined_schema(name):
+    """Returns True if named schema is registered."""
     global _SCHEMAS
     return True if _SCHEMAS.get(name) else False
 
 def add_schema(name, cls):
+    """Add a schema"""
     global _SCHEMAS
     _SCHEMAS[name] = cls

@@ -1,20 +1,21 @@
-import re
+"""Swagger decorators"""
 import inspect
-from functools import wraps
-from tornado_swirl import docparser
+
 import tornado.web
+
+from tornado_swirl import docparser
 from tornado_swirl.handlers import swagger_handlers
 from tornado_swirl.settings import add_api_handler, add_route, add_schema
 
-import inspect
-from tornado_swirl import docparser
 
-
-def is_rest_api_method(object):
-    return (inspect.isfunction(object) or inspect.ismethod(object)) and object.__name__ in ('get', 'post', 'put', 'delete')
+def is_rest_api_method(obj):
+    """Determines if function or method object is an HTTP method handler object"""
+    return (inspect.isfunction(obj) or inspect.ismethod(obj)) and \
+            obj.__name__ in ('get', 'post', 'put', 'delete')
 
 
 def restapi(url, **kwargs):
+    """REST API endpoint decorator."""
     def _real_decorator(cls):
         cls.rest_api = True
         cls.tagged_api_comps = []
@@ -35,7 +36,7 @@ def restapi(url, **kwargs):
 
 
 def schema(cls):
-
+    """REST API schema decorator"""
     name = cls.__name__
     doc = inspect.getdoc(cls)
     model_spec = docparser.parse_from_docstring(doc, spec='schema')
@@ -43,9 +44,10 @@ def schema(cls):
         cls.schema_spec = model_spec
         add_schema(name, cls)
     return cls
-    
+
 
 class Application(tornado.web.Application):
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):
-        super(Application, self).__init__((swagger_handlers() +
-                                          handlers) if handlers else swagger_handlers(), default_host, transforms, **settings)
+        super(Application, self).__init__(
+            (swagger_handlers() + handlers) if handlers else swagger_handlers(),
+            default_host, transforms, **settings)

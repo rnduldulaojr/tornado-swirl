@@ -22,13 +22,13 @@ _HEADERS = {
     _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):", procs._process_errors),
     _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", procs._process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", procs._process_properties),
-} 
+}
 
-_HEADERS_REGEX = { key: (re.compile("^"+val+"$", re.IGNORECASE), processor) for (key, (val, processor)) in _HEADERS.items()}
-_ALL_HEADERS = '|'.join([ rs for (rs, _) in _HEADERS.values()])
+_HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
+                  for (key, (val, processor)) in _HEADERS.items()}
+_ALL_HEADERS = '|'.join([rs for (rs, _) in _HEADERS.values()])
 _ALL_HEADERS_REGEX = re.compile("^("+_ALL_HEADERS+")$", re.IGNORECASE)
 _SECTION_HEADER_REGEX = re.compile(r"^([\w ]+):$")
-
 
 
 S_START = 0
@@ -42,13 +42,13 @@ S_SECTION = 5
 # transitions
 
 def _get_header_type(section_header):
-    #returns header type and some info
-    #print(section_header)
+    # returns header type and some info
+    # print(section_header)
     for (name, (regex, _)) in _HEADERS_REGEX.items():
         matcher = regex.match(str(section_header))
         if matcher:
             if name == _RESPONSE_HEADERS:
-                return (name, { "code": matcher.group('code') or '200' })
+                return (name, {"code": matcher.group('code') or '200'})
             return (name, None)
     return (None, None)
 
@@ -64,17 +64,19 @@ def transition_buffer(fsm_obj):
 def transition_section(fsm_obj):
     fsm_obj._cur_header = fsm_obj.current_line.strip()
 
+
 def transition_props(fsm_obj):
     pass
 
+
 def transition_process_buffer(fsm_obj):
     #print("Processing buffer")
-    #get cur header type
+    # get cur header type
     htype, params = _get_header_type(fsm_obj._cur_header)
     #print("Header type: ", htype)
     _, processor = _HEADERS_REGEX.get(htype, (None, None))
 
-    #process the buffer
+    # process the buffer
     if not processor:
         return
     if params:
@@ -83,6 +85,7 @@ def transition_process_buffer(fsm_obj):
         processor(fsm_obj)
     fsm_obj.cur_header = None
     fsm_obj._buffer = ''
+
 
 def transition_process_buffer_new_section(fsm_obj):
     transition_process_buffer(fsm_obj)
@@ -100,6 +103,7 @@ def transition_description(fsm_obj):
 
 # conditions
 
+
 def is_generic_line(line):
     line = line.strip()
     if _SECTION_HEADER_REGEX.match(line):
@@ -110,18 +114,21 @@ def is_generic_line(line):
         return False
 
     #print("Detected generic line")
-    return True 
+    return True
 
 
 def is_end(line):
     return line.strip() == "--THE END--"
 
+
 def is_blank_line(line):
     #print("Detected blank" if line.strip == "" else "")
     return line.strip() == ""
 
+
 def is_generic_line_or_blank(line):
     return is_generic_line(line) or is_blank_line(line)
+
 
 def is_section_header(line):
     #print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
@@ -130,42 +137,39 @@ def is_section_header(line):
 
 FSM_MAP = (
     {'src': S_START, 'dst': S_SUMMARY, 'condition': is_generic_line,
-        'callback': transition_buffer},
+     'callback': transition_buffer},
     {'src': S_SUMMARY, 'dst': S_SUMMARY,
-        'condition': is_generic_line, 'callback': transition_buffer},
+     'condition': is_generic_line, 'callback': transition_buffer},
     {'src': S_SUMMARY, 'dst': S_BLANK,
-        'condition': is_blank_line, 'callback': transition_summary},
+     'condition': is_blank_line, 'callback': transition_summary},
     {'src': S_SUMMARY, 'dst': S_END,
-        'condition': is_end, 'callback': transition_summary},  
+     'condition': is_end, 'callback': transition_summary},
     {'src': S_BLANK, 'dst': S_DESCRIPTION, 'condition': is_generic_line,
-        'callback': transition_buffer},
+     'callback': transition_buffer},
     {'src': S_DESCRIPTION, 'dst': S_DESCRIPTION,
-        'condition': is_generic_line, 'callback': transition_buffer},
+     'condition': is_generic_line, 'callback': transition_buffer},
     {'src': S_DESCRIPTION, 'dst': S_BLANK,
-        'condition': is_blank_line, 'callback': transition_description},
-    {'src': S_START, 'dst': S_SECTION, 
-        'condition': is_section_header, 'callback': transition_section},
+     'condition': is_blank_line, 'callback': transition_description},
+    {'src': S_START, 'dst': S_SECTION,
+     'condition': is_section_header, 'callback': transition_section},
     {'src': S_BLANK, 'dst': S_SECTION,
-        'condition': is_section_header, 'callback': transition_section},
+     'condition': is_section_header, 'callback': transition_section},
     {'src': S_SECTION, 'dst': S_SECTION,
-        'condition': is_generic_line_or_blank, 'callback': transition_buffer},
+     'condition': is_generic_line_or_blank, 'callback': transition_buffer},
     {'src': S_SECTION, 'dst': S_SECTION,
-        'condition': is_section_header, 'callback': transition_process_buffer_new_section},
+     'condition': is_section_header, 'callback': transition_process_buffer_new_section},
     {'src': S_SECTION, 'dst': S_END,
-        'condition': is_end, 'callback': transition_process_buffer
-    },
-    {'src': S_START, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
-    {'src': S_BLANK, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
-    {'src': S_DESCRIPTION, 'dst': S_END, 'condition': is_end, 'callback': transition_process_buffer},
+     'condition': is_end, 'callback': transition_process_buffer},
+    {'src': S_START, 'dst': S_END, 'condition': is_end,
+     'callback': transition_process_buffer},
+    {'src': S_BLANK, 'dst': S_END, 'condition': is_end,
+     'callback': transition_process_buffer},
+    {'src': S_DESCRIPTION, 'dst': S_END, 'condition': is_end,
+     'callback': transition_process_buffer},
 )
 
-FSM_MAP_SCHEMA = {
 
-}
-
-
-class Parse_FSM:
-
+class ParseFSM:
     def __init__(self, fsm_map,  lines, spec='operation'):
         self.input_lines = lines + ["--THE END--"]
         self.current_state = S_START
@@ -211,9 +215,6 @@ class Parse_FSM:
 def parse_from_docstring(docstring: str, spec='operation'):
     # preprocess lines
     lines = docstring.splitlines(keepends=True)
-    p = Parse_FSM(FSM_MAP, lines, spec)
+    p = ParseFSM(FSM_MAP, lines, spec)
     p.run()
     return p.spec
-
-
-

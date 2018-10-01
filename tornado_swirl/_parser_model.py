@@ -1,4 +1,9 @@
+"""Parser FSM models."""
+
+
 class PathSpec(object):
+    """Represents the path specification of an REST API endpoint."""
+
     def __init__(self):
         self.summary = ""
         self.description = ""
@@ -13,16 +18,25 @@ class PathSpec(object):
 
 
 class SchemaSpec(object):
+    """Represents a REST API component schema."""
+
     def __init__(self):
         self.name = ""
         self.summary = ""
         self.description = ""
         self.properties = {}
 
+
 class Param(object):
-    def __init__(self, name, dtype='string', ptype='path', required=False, description=None, order=0):
+    """REST API section parameter"""
+
+    def __init__(self, name, dtype='string', ptype='path',
+                 required=False, description=None, order=0):
         self.name = name
-        self.type = dtype.strip()
+        if dtype:
+            self.type = dtype.strip()
+        else:
+            self.type = None
         self.ptype = ptype
         self.required = required
         self.description = description
@@ -34,13 +48,10 @@ class Param(object):
             self.type = "array"
 
         if self.type and self.type.startswith('enum[') and self.type.endswith(']'):
-            content = [c.strip() for c in self.type[self.type.find('[')+1:self.type.rfind(']')].split(',')]
+            content = [c.strip() for c in
+                       self.type[self.type.find('[')+1:self.type.rfind(']')].split(',')]
 
             self.itype = {
                 "enum": content
             }
             self.type = "string"
-
-    def is_model_type(self):
-        # TODO: connect with models lookup
-        return False
