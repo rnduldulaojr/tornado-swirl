@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-from urllib.parse import urlparse, urljoin
 import inspect
-import tornado.web
-import tornado.template
-from tornado.util import re_unescape
-from .settings import SWAGGER_VERSION, URL_SWAGGER_API_LIST, URL_SWAGGER_API_SPEC, api_routes, get_schemas, is_defined_schema
 import json
 import re
+from urllib.parse import urljoin
 
+import tornado.template
+import tornado.web
+from tornado.util import re_unescape
+
+from .settings import (SWAGGER_VERSION, #URL_SWAGGER_API_LIST,
+                       URL_SWAGGER_API_SPEC, api_routes, get_schemas,
+                       is_defined_schema)
 
 __author__ = 'rduldulao'
 
@@ -17,6 +20,7 @@ def json_dumps(obj, pretty=False):
 
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
+    """Serves the Swagger UI"""
     def initialize(self, static_path, **kwds):
         self.static_path = static_path
 
@@ -52,7 +56,10 @@ class SwaggerUIHandler(tornado.web.RequestHandler):
 
 
 class SwaggerApiHandler(tornado.web.RequestHandler):
+    """Openapi 3.0 spec generator class handler"""
+
     def initialize(self, title, description, api_version, base_url, schemes, **kwds):
+        """init handler"""
         self.api_version = api_version
         self.base_url = base_url
         self.title = title
@@ -60,8 +67,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         self.schemes = schemes
 
     def get(self):
+        """Get handler"""
         self.set_header('content-type', 'application/json')
-        apis = self.find_api(self.application)  # this is a generator
+        apis = self.find_api()  # this is a generator
         specs = {
             'openapi': SWAGGER_VERSION,
             'info': {
@@ -73,7 +81,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                          "description": "This server"
                          }],
             'schemes': self.schemes,
-            'paths': {path: self.__get_api_spec(path, spec, operations)
+            'paths': {path: self.__get_api_spec(spec, operations)
                       for path, spec, operations in apis},
         }
 
@@ -83,7 +91,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 {
                     "components": {
                         "schemas": {
-                            name: self.__get_schema_spec(schemaCls) for (name, schemaCls) in schemas.items()
+                            name: self.__get_schema_spec(schemaCls)
+                            for (name, schemaCls) in schemas.items()
                         }
                     }
                 }
@@ -97,7 +106,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                  for (_, prop) in spec.properties.items()]
         required = [name for name, _, req in props if req]
 
-        val = { "type": "object" }
+        val = {"type": "object"}
         if required:
             val.update({"required": required})
 
@@ -110,12 +119,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return val
 
     def _prop_to_dict(self, prop):
-        d = self.__get_type(prop)['schema']
-        if d is not None:
-            d.update(prop.kwargs)
-        return d
+        schema = self.__get_type(prop)['schema']
+        if schema is not None:
+            schema.update(prop.kwargs)
+        return schema
 
-    def __get_api_spec(self, path, spec, operations):
+    def __get_api_spec(self, spec, operations):
         paths = {}
         for api in operations:
             paths[api[0]] = {
@@ -130,13 +139,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
             paths[api[0]]["responses"] = self.__get_responses(api[1])
         return paths
-        
+
     def __detect_content_from_type(self, val) -> (str, bool, str):
+        print(get_schemas().keys())
         if val.type == "file":
             return "file", False, val.itype
         if val.type in get_schemas().keys():
             return val.type, True, None
-    
+
         return val.type, False, None
 
     def __get_params(self, path_spec):
@@ -157,7 +167,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
                 param_data.update(self.__get_type(param))
                 params.append(param_data)
-        return params    
+        return params
 
     def __get_request_body(self, path_spec):
         contents = {}
@@ -166,7 +176,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             form_data_detected = 0 #application/x-www-form-urlencoded
             models_detected = 0 #application/json or application/xml
 
-            for (name, val) in path_spec.body_params.items():
+            for (_, val) in path_spec.body_params.items():
                 content, ismodel, ftype = self.__detect_content_from_type(val)
                 print(content, ismodel, ftype)
                 if ftype is not None:
@@ -182,38 +192,38 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 contents[ctype] = {
                     "schema": {
                         "properties": {
-                            spec.name: self.__get_real_type(spec.type)['schema'] for spec in path_spec.body_params.values()
+                            spec.name: self.__get_real_type(spec.type)['schema']
+                            for spec in path_spec.body_params.values()
                         }
                     }
                 }
             elif files_detected == 1 and not form_data_detected and not models_detected:
-                f = list(path_spec.body_params.values())[0]
-                contents[f.itype] = {
+                entry = list(path_spec.body_params.values())[0]
+                contents[entry.itype] = {
                     "schema": {
                         "type": "string",
                         "format": "binary"  #TODO: When to use byte/base64?
                     }
                 }
-            elif (files_detected > 0 and (form_data_detected > 0 or models_detected > 0)) or models_detected > 1:
+            elif (files_detected > 0 and \
+                  (form_data_detected > 0 or models_detected > 0)) or \
+                  models_detected > 1:
                 contents["multipart/form-data"] = {
                     "schema": {
                         "properties": {
-                            spec.name: self.__get_real_type(spec.type)['schema'] for spec in path_spec.body_params.values()
+                            spec.name: self.__get_real_type(spec.type)['schema']
+                            for spec in path_spec.body_params.values()
                         }
                     }
                 }
             elif models_detected == 1 and not files_detected and not form_data_detected:
-                f = list(path_spec.body_params.values())[0]
-                t = f.itype or 'application/json'
-                contents[t] = self.__get_type(f)
+                file_entry = list(path_spec.body_params.values())[0]
+                file_type = file_entry.itype or 'application/json'
+                contents[file_type] = self.__get_type(file_entry)
             else:
                 ctype = 'Unknown'
 
         return {"content": contents}
-            
-        
-
-       
 
     def __get_responses(self, path_spec):
         params = {}
@@ -232,15 +242,18 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def _detect_content(self, param):
 
-        if param.type not in ('integer', 'int', 'string', 'str', 'boolean', 'bool', 'number', 'int32', 'int64',
-                              'float', 'double', "byte", "binary", "date", "date-time", "password"):
+        if param.type not in ('integer', 'int', 'string', 'str', 'boolean', 'bool',
+                              'number', 'int32', 'int64', 'float', 'double', "byte",
+                              'binary', 'date', 'date-time', 'password'):
             if param.type == "array":
-                return {"application/json": {
-                    "schema": {
-                        "type": "array",
-                        # TODO: apply refs
-                        "items": self.__get_real_type(param.itype)["schema"]
-                    }}
+                return {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            # TODO: apply refs
+                            "items": self.__get_real_type(param.itype)["schema"]
+                        }
+                    }
                 }
 
             return {"application/json": self.__get_real_type(param.type)}
@@ -315,11 +328,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def __get_type(self, param):
         if param.type == "array":
-            val =  { "type": "array",
-                     "items": {
-                         "type": param.itype  # TODO detect type
-                     }
+            val = {"type": "array",
+                   "items": {
+                       "type": param.itype  # TODO detect type
                    }
+                  }
             val.update(param.kwargs)
             return {"schema": val}
         if isinstance(param.itype, dict):
@@ -333,23 +346,24 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return real_type
 
     @staticmethod
-    def find_api(application):
+    def find_api():
         for route_spec in api_routes():
             # TODO decorate  url
-            url, groups = _find_groups(route_spec[0])
+            url, _ = _find_groups(route_spec[0])
             path = url
-            h = route_spec[1]
+            spec = route_spec[1]
             operations = [(name, member.path_spec) for (
-                name, member) in inspect.getmembers(h) if hasattr(member, 'path_spec')]
-            # since these ops have the same path, they should have the same path_params in their path_spec, so get the member with
+                name, member) in inspect.getmembers(spec) if hasattr(member, 'path_spec')]
+            # since these ops have the same path, they should have the same path_params
+            # in their path_spec, so get the member with
             # the most path_param and set it on all
             if operations:
                 path_param_spec = operations[0][1].path_params
                 for (_, path_spec) in operations[1:]:
                     if len(path_spec.path_params) > len(path_param_spec):
                         path_param_spec = path_spec.path_params
-                for _, ps in operations:
-                    ps.path_params = path_param_spec
+                for _, path_sp in operations:
+                    path_sp.path_params = path_param_spec
                 vals = path_param_spec.values()
                 sorted(vals, key=lambda x: x.order)
                 path = url % tuple(
@@ -359,7 +373,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             else:
                 continue
 
-            yield path, h, operations
+            yield path, spec, operations
 
 
 def _find_groups(url: str):

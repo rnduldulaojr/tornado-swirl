@@ -39,7 +39,7 @@ def add_api_handler(cls):
     """Adds a REST API handler class"""
     _API_HANDLERS.append(cls)
 
-def add_route(path, handler,  **kwargs):
+def add_route(path, handler, **kwargs):
     """Add a REST API route."""
     _ROUTES.append((path, handler, kwargs))
 
@@ -58,6 +58,5 @@ def is_defined_schema(name):
 
 def add_schema(name, cls):
     """Add a schema"""
-    global _SCHEMAS 
+    global _SCHEMAS
     _SCHEMAS[name] = cls
-

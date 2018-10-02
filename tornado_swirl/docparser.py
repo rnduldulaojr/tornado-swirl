@@ -1,7 +1,13 @@
-import re
-import tornado_swirl._processors as procs
-from tornado_swirl._parser_model import PathSpec, SchemaSpec
+"""Docstring line parser implementation.
 
+Returns:
+    [type] -- [description]
+"""
+
+import numbers
+import re
+
+from tornado_swirl._parser_model import Param, PathSpec, SchemaSpec
 
 _QUERY_HEADERS = 'query headers'
 _PATH_HEADERS = 'path headers'
@@ -12,17 +18,176 @@ _ERROR_HEADERS = 'errors'
 _RESPONSE_HEADERS = 'responses'
 _PROPERTY_HEADERS = 'properties'
 
+#data processors
+# objects
+QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
+RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
+RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)
+ERRORSPEC_REGEX = r"^(?P<code>\d+)\s*--\s*(?P<description>.*)$"
+ERRORSPEC_MATCHER = re.compile(ERRORSPEC_REGEX, re.IGNORECASE)
+
+# _PROP_SPEC_REGEX = re.compile("(?P<name>\w+): (?P<value>\w[\w\s]*)")}
+class Number(numbers.Number):
+    """Convenience type class to represent float or int"""
+    def __new__(cls, val):
+        if str(val).find('.'):
+            try:
+                return float(val)
+            except ValueError:
+                return val
+        try:
+            return int(val)
+        except ValueError:
+            return val
+
+class Boolean(object):
+    """Convenience type class to convert bool values"""
+    def __new__(cls, val):
+        return val in ('True', 'true', '1', True)
+
+
+_PROPS_TYPE_LOOKUP = {
+    Boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems'),
+    Number: ('minimum', 'maximum', 'multipleOf', 'minItems', 'maxItems')
+}
+
+def _lookup_type_of(name):
+    for typ, names in _PROPS_TYPE_LOOKUP.items():
+        if name in names:
+            return typ
+    return str
+
+def _process_params(fsm_obj, ptype, required_func=None):
+    # get buffer and conver
+    # first merge lines without -- to previous lines
+    if required_func is None:
+        required_func = lambda x, y: x == y
+
+    lines = fsm_obj.buffer.splitlines()
+    cleaned_lines = _clean_lines(lines)
+    params = {}
+    # parse the lines
+    for i, line in enumerate(cleaned_lines):
+        matcher = PARAM_MATCHER.match(line.lstrip())
+        if not matcher:
+            continue
+        param = Param(name=matcher.group('name'),
+                      dtype=matcher.group('type'),
+                      ptype=ptype,
+                      required=required_func(str(matcher.group('required')
+                                                 ).lower(), "required"),
+                      order=i,
+                      )
+        description = str(matcher.group('description')).strip()
+        desc, kwargs = _get_description_props(description)
+        param.description = desc.strip()
+        param.kwargs = kwargs
+        params[param.name] = param
+    return params
+
+
+def _process_path(fsm_obj, **kwargs):
+    fsm_obj.spec.path_params = _process_params(
+        fsm_obj, "path", lambda x, y: True)
+    _set_default_type(fsm_obj.spec.path_params, "string")
+    fsm_obj.buffer = ""
+
+
+def _get_real_value(name, value):
+    dtype = _lookup_type_of(name)
+    return dtype(value)
+
+
+def _get_description_props(description: str):
+    """Returns description, kwargs"""
+    kwargs = {}
+
+    index = description.rfind(':')
+    while index > -1:
+        description, value = description[0:index], description[index+1:]
+        boundary = max(description.rfind(' '), description.rfind('\n'))
+        description, name = description[0:boundary], description[boundary+1:]
+        kwargs[name] = _get_real_value(name, value.strip())
+        index = description.rfind(':')
+
+    return description, kwargs
+
+def _set_default_type(dval, dtype):
+    for (name, param) in dval.items():
+        if not param.type:
+            dval[name].type = dtype
+
+def _process_query(fsm_obj, **kwargs):
+    fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
+    _set_default_type(fsm_obj.spec.query_params, "string")
+    fsm_obj.buffer = ""
+
+def _process_body(fsm_obj, **kwargs):
+    # first merge lines without -- to previous lines
+    # TODO: change this
+    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
+    #check the params and guess the content type
+    _set_default_type(fsm_obj.spec.body_params, "string")
+    fsm_obj.buffer = ''
+
+def _process_cookie(fsm_obj, **kwargs):
+    fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie", **kwargs)
+    _set_default_type(fsm_obj.spec.cookie_params, "string")
+    fsm_obj.buffer = ""
+
+
+def _process_header(fsm_obj, **kwargs):
+    fsm_obj.spec.header_params = _process_params(fsm_obj, "header", **kwargs)
+    #convert all types to string if None
+    _set_default_type(fsm_obj.spec.header_params, "string")
+    fsm_obj.buffer = ""
+
+
+def _process_response(fsm_obj, **kwargs):
+    cur_code = kwargs.get('code', '200')
+    print("Cur_code: ", cur_code)
+    res = _process_params(fsm_obj, "response")
+    if res:
+        item = list(res.values())[0]
+        item.name = cur_code
+        fsm_obj.spec.responses.update({
+            cur_code: item
+        })
+    fsm_obj.buffer = ""
+
+def _process_properties(fsm_obj, **kwargs):
+    fsm_obj.spec.properties = _process_params(fsm_obj, "property")
+    _set_default_type(fsm_obj.spec.properties, "string")
+    fsm_obj.buffer = ""
+
+def _process_errors(fsm_obj, **kwargs):
+    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
+    fsm_obj.buffer = ""
+
+
+def _clean_lines(lines: []):
+    cleaned_lines, lines = [lines[0].strip()], lines[1:]
+    while lines:
+        cur_line, lines = lines[0], lines[1:]
+        try:
+            cur_line.lstrip().index(' -- ')
+            cleaned_lines.append(cur_line.strip())
+        except ValueError:
+            cleaned_lines[-1] = cleaned_lines[-1] + " " + cur_line.strip()
+    return cleaned_lines
+
 # Header regexes, buffer processor func
 _HEADERS = {
-    _QUERY_HEADERS: (r"query param(s|eter(s)?)?:", procs._process_query),
-    _PATH_HEADERS: (r"(path|url) param(s|eter(s)?)?:", procs._process_path),
-    _BODY_HEADERS: (r"(request\s*)? body:", procs._process_body),
-    _COOKIE_HEADERS: (r"cookie(s|(\s*param(s|eter(s)?)?)?)?:", procs._process_cookie),
-    _HEADER_HEADERS: (r"(http\s*)?header(s)?:", procs._process_header),
-    _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):", procs._process_errors),
-    _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", procs._process_response),
-    _PROPERTY_HEADERS: (r"(propert(y|ies):)", procs._process_properties),
-    
+    _QUERY_HEADERS: (r"query param(s|eter(s)?)?:", _process_query),
+    _PATH_HEADERS: (r"(path|url) param(s|eter(s)?)?:", _process_path),
+    _BODY_HEADERS: (r"(request\s*)? body:", _process_body),
+    _COOKIE_HEADERS: (r"cookie(s|(\s*param(s|eter(s)?)?)?)?:", _process_cookie),
+    _HEADER_HEADERS: (r"(http\s*)?header(s)?:", _process_header),
+    _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):",
+                     _process_errors),
+    _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", _process_response),
+    _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
 }
 
 _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
@@ -54,26 +219,22 @@ def _get_header_type(section_header):
     return (None, None)
 
 
-def transition_blank(fsm_obj):
+def _transition_blank(fsm_obj):
     pass
 
 
-def transition_buffer(fsm_obj):
-    fsm_obj._buffer += fsm_obj.current_line.lstrip()
+def _transitionbuffer(fsm_obj):
+    fsm_obj.buffer += fsm_obj.current_line.lstrip()
 
 
-def transition_section(fsm_obj):
-    fsm_obj._cur_header = fsm_obj.current_line.strip()
+def _transition_section(fsm_obj):
+    fsm_obj.cur_header = fsm_obj.current_line.strip()
 
 
-def transition_props(fsm_obj):
-    pass
-
-
-def transition_process_buffer(fsm_obj):
+def _transition_processbuffer(fsm_obj):
     #print("Processing buffer")
     # get cur header type
-    htype, params = _get_header_type(fsm_obj._cur_header)
+    htype, params = _get_header_type(fsm_obj.cur_header)
     #print("Header type: ", htype)
     _, processor = _HEADERS_REGEX.get(htype, (None, None))
 
@@ -85,92 +246,98 @@ def transition_process_buffer(fsm_obj):
     else:
         processor(fsm_obj)
     fsm_obj.cur_header = None
-    fsm_obj._buffer = ''
+    fsm_obj.buffer = ''
 
 
-def transition_process_buffer_new_section(fsm_obj):
-    transition_process_buffer(fsm_obj)
-    transition_section(fsm_obj)
+def _transition_processbuffer_new_section(fsm_obj):
+    _transition_processbuffer(fsm_obj)
+    _transition_section(fsm_obj)
 
 
-def transition_summary(fsm_obj):
-    fsm_obj.spec.summary = fsm_obj._buffer
-    fsm_obj._buffer = ""
+def _transition_summary(fsm_obj):
+    fsm_obj.spec.summary = fsm_obj.buffer
+    fsm_obj.buffer = ""
 
 
-def transition_description(fsm_obj):
-    fsm_obj.spec.description += fsm_obj._buffer
-    fsm_obj._buffer = ""
+def _transition_description(fsm_obj):
+    fsm_obj.spec.description += fsm_obj.buffer
+    fsm_obj.buffer = ""
 
 # conditions
 
 
-def is_generic_line(line):
+def _is_generic_line(line):
     line = line.strip()
     if _SECTION_HEADER_REGEX.match(line):
         return False
     if line == "":
         return False
-    if is_end(line):
+    if _is_end(line):
         return False
 
     #print("Detected generic line")
     return True
 
 
-def is_end(line):
+def _is_end(line):
     return line.strip() == "--THE END--"
 
 
-def is_blank_line(line):
+def _is_blank_line(line):
     #print("Detected blank" if line.strip == "" else "")
     return line.strip() == ""
 
 
-def is_generic_line_or_blank(line):
-    return is_generic_line(line) or is_blank_line(line)
+def _is_generic_line_or_blank(line):
+    return _is_generic_line(line) or _is_blank_line(line)
 
 
-def is_section_header(line):
+def _is_section_header(line):
     #print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
     return True if _SECTION_HEADER_REGEX.match(line.strip()) else False
 
 
+
+
+
+
 FSM_MAP = (
-    {'src': S_START, 'dst': S_SUMMARY, 'condition': is_generic_line,
-     'callback': transition_buffer},
+    {'src': S_START, 'dst': S_SUMMARY, 'condition': _is_generic_line,
+     'callback': _transitionbuffer},
     {'src': S_SUMMARY, 'dst': S_SUMMARY,
-     'condition': is_generic_line, 'callback': transition_buffer},
+     'condition': _is_generic_line, 'callback': _transitionbuffer},
     {'src': S_SUMMARY, 'dst': S_BLANK,
-     'condition': is_blank_line, 'callback': transition_summary},
+     'condition': _is_blank_line, 'callback': _transition_summary},
     {'src': S_SUMMARY, 'dst': S_END,
-     'condition': is_end, 'callback': transition_summary},
-    {'src': S_BLANK, 'dst': S_DESCRIPTION, 'condition': is_generic_line,
-     'callback': transition_buffer},
+     'condition': _is_end, 'callback': _transition_summary},
+    {'src': S_BLANK, 'dst': S_DESCRIPTION, 'condition': _is_generic_line,
+     'callback': _transitionbuffer},
     {'src': S_DESCRIPTION, 'dst': S_DESCRIPTION,
-     'condition': is_generic_line, 'callback': transition_buffer},
+     'condition': _is_generic_line, 'callback': _transitionbuffer},
     {'src': S_DESCRIPTION, 'dst': S_BLANK,
-     'condition': is_blank_line, 'callback': transition_description},
+     'condition': _is_blank_line, 'callback': _transition_description},
     {'src': S_START, 'dst': S_SECTION,
-     'condition': is_section_header, 'callback': transition_section},
+     'condition': _is_section_header, 'callback': _transition_section},
     {'src': S_BLANK, 'dst': S_SECTION,
-     'condition': is_section_header, 'callback': transition_section},
+     'condition': _is_section_header, 'callback': _transition_section},
     {'src': S_SECTION, 'dst': S_SECTION,
-     'condition': is_generic_line_or_blank, 'callback': transition_buffer},
+     'condition': _is_generic_line_or_blank, 'callback': _transitionbuffer},
     {'src': S_SECTION, 'dst': S_SECTION,
-     'condition': is_section_header, 'callback': transition_process_buffer_new_section},
+     'condition': _is_section_header, 'callback': _transition_processbuffer_new_section},
     {'src': S_SECTION, 'dst': S_END,
-     'condition': is_end, 'callback': transition_process_buffer},
-    {'src': S_START, 'dst': S_END, 'condition': is_end,
-     'callback': transition_process_buffer},
-    {'src': S_BLANK, 'dst': S_END, 'condition': is_end,
-     'callback': transition_process_buffer},
-    {'src': S_DESCRIPTION, 'dst': S_END, 'condition': is_end,
-     'callback': transition_process_buffer},
+     'condition': _is_end, 'callback': _transition_processbuffer},
+    {'src': S_START, 'dst': S_END, 'condition': _is_end,
+     'callback': _transition_processbuffer},
+    {'src': S_BLANK, 'dst': S_END, 'condition': _is_end,
+     'callback': _transition_processbuffer},
+    {'src': S_DESCRIPTION, 'dst': S_END, 'condition': _is_end,
+     'callback': _transition_processbuffer},
 )
 
-class ParseFSM:
-    def __init__(self, fsm_map,  lines, spec='operation'):
+class _ParseFSM:
+    """Internal line docstring parser"""
+
+    def __init__(self, fsm_map, lines, spec='operation'):
         self.input_lines = lines + ["--THE END--"]
         self.current_state = S_START
         self.current_line = None
@@ -183,38 +350,59 @@ class ParseFSM:
         self._cur_header = None
         self.fsm_map = fsm_map
 
-    def run(self):
-        for c in self.input_lines:
-            if not self.process_next(c):
-                print("skip '{}' in {}".format(c, self.current_state))
+    @property
+    def buffer(self):
+        "Get the buffer"
+        return self._buffer
 
-    def process_next(self, line):
+    @buffer.setter
+    def buffer(self, val):
+        self._buffer = val
+
+    @property
+    def cur_header(self):
+        """Get current detected header"""
+        return self._cur_header
+
+    @cur_header.setter
+    def cur_header(self, val):
+        """Get current detected header"""
+        self._cur_header = val
+
+    def run(self):
+        """Parser run"""
+        for line in self.input_lines:
+            if not self._process_next(line):
+                print("skip '{}' in {}".format(line, self.current_state))
+
+    def _process_next(self, line):
         self.current_line = line
         frozen_state = self.current_state
         for transition in FSM_MAP:
             if transition['src'] == frozen_state:
-                if self.iterate_re_evaluators(line, transition):
+                if self._iterate_re_evaluators(line, transition):
                     return True
         return False
 
-    def iterate_re_evaluators(self, line, transition):
+    def _iterate_re_evaluators(self, line, transition):
         condition = transition['condition']
         if condition(line):
             #print("current ", self.current_state)
-            self.update_state(
+            self._update_state(
                 transition['dst'], transition['callback'])
             return True
         return False
 
-    def update_state(self, new_state, callback):
+    def _update_state(self, new_state, callback):
         self.current_state = new_state
         #print("new state ", self.current_state)
         callback(self)
 
 
 def parse_from_docstring(docstring: str, spec='operation'):
+    """Returns path spec from docstring"""
     # preprocess lines
     lines = docstring.splitlines(keepends=True)
-    p = ParseFSM(FSM_MAP, lines, spec)
-    p.run()
-    return p.spec
+    parser = _ParseFSM(FSM_MAP, lines, spec)
+    parser.run()
+    return parser.spec

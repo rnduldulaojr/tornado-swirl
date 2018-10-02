@@ -46,11 +46,14 @@ def schema(cls):
     return cls
 
 def describe(title='Sample API', description='Sample description', **kwargs):
+    """Describe API"""
     default_settings.update({"title": title, "description": description})
     if kwargs:
         default_settings.update(kwargs)
 
 class Application(tornado.web.Application):
+    """Swirl Application class"""
+
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):
         super(Application, self).__init__(
             (swagger_handlers() + handlers) if handlers else swagger_handlers(),

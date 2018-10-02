@@ -205,3 +205,49 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['paths']['/test/form']['post']['requestBody']
         assert obj['paths']['/test/form']['post']['requestBody']['content']
         assert obj['paths']['/test/form']['post']['requestBody']['content']['text/csv']
+
+
+    @gen_test
+    def test_request_body_model(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            async def post(self, a, b):
+                """This is a simple test post with form data.
+
+                This is a simple description.
+
+                Request Body:
+                    user (Model) -- Model model.
+                    
+                
+                Response:
+                    out (string) -- An output.
+
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+
+        @swirl.schema
+        class Model(object):
+            """This is a sample model.
+
+            Foo Bar description.
+
+            Properties:
+                name (string): Foo name
+                type (enum[foo, bar]) : Foo type
+            """
+            pass
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+        print(response.body)
+        assert obj['paths']
+        assert obj['paths']['/test/form']
+        assert obj['paths']['/test/form']['post']
+        assert obj['paths']['/test/form']['post']['requestBody']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']
+        assert obj['paths']['/test/form']['post']['requestBody']['content']['application/json']

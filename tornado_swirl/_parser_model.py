@@ -61,17 +61,13 @@ class Param(object):
                 colon = self.type.find(':')
 
             if self.type and self.type.startswith('file'):
-                if colon ==  -1:
+                if colon == -1:
                     self.itype = 'text/plain'
                 else:
                     self.itype = self.type[colon+1:]
                     colon = -1 #reset
                 self.type = "file"
-            
 
             if colon > -1:  #for example Model:application/json or Model:application/xml
                 self.itype = self.type[colon+1:]
                 self.type = self.type[:colon]
-
-        
-

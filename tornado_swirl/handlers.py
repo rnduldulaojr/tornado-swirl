@@ -8,7 +8,7 @@ from tornado.web import StaticFileHandler, URLSpec
 from tornado_swirl.views import (SwaggerApiHandler, #SwaggerResourcesHandler,
                                  SwaggerUIHandler)
 
-from .settings import (URL_SWAGGER_API_DOCS, URL_SWAGGER_API_LIST,
+from .settings import (URL_SWAGGER_API_DOCS, #URL_SWAGGER_API_LIST,
                        URL_SWAGGER_API_SPEC, default_settings)
 
 __author__ = 'rduldulao'

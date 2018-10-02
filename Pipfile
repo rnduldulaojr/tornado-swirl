@@ -12,6 +12,7 @@ pylint = "*"
 "autopep8" = "*"
 pytest = "*"
 pytest-cov = "*"
+rope = "*"
 
 [requires]
 python_version = "3.7"
