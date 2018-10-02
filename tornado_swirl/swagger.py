@@ -5,7 +5,7 @@ import tornado.web
 
 from tornado_swirl import docparser
 from tornado_swirl.handlers import swagger_handlers
-from tornado_swirl.settings import add_api_handler, add_route, add_schema
+from tornado_swirl.settings import add_api_handler, add_route, add_schema, default_settings
 
 
 def is_rest_api_method(obj):
@@ -45,6 +45,10 @@ def schema(cls):
         add_schema(name, cls)
     return cls
 
+def describe(title='Sample API', description='Sample description', **kwargs):
+    default_settings.update({"title": title, "description": description})
+    if kwargs:
+        default_settings.update(kwargs)
 
 class Application(tornado.web.Application):
     def __init__(self, handlers=None, default_host="", transforms=None, **settings):

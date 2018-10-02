@@ -17,6 +17,9 @@ default_settings = {
     'static_path': STATIC_PATH,
     'swagger_prefix': '/swagger',
     'api_version': 'v1.0',
+    'title': 'Sample API',
+    'description': 'Sample description',
+    'schemes': ['http'],
     'api_key': '',
     'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
     'exclude_namespaces': [],
@@ -57,3 +60,4 @@ def add_schema(name, cls):
     """Add a schema"""
     global _SCHEMAS 
     _SCHEMAS[name] = cls
+

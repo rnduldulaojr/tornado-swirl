@@ -5,13 +5,13 @@ Swagger handler utils
 
 from tornado.web import StaticFileHandler, URLSpec
 
-from tornado_swirl.views import (SwaggerApiHandler, SwaggerResourcesHandler,
+from tornado_swirl.views import (SwaggerApiHandler, #SwaggerResourcesHandler,
                                  SwaggerUIHandler)
 
 from .settings import (URL_SWAGGER_API_DOCS, URL_SWAGGER_API_LIST,
                        URL_SWAGGER_API_SPEC, default_settings)
 
-__author__ = 'serena'
+__author__ = 'rduldulao'
 
 
 def swagger_handlers():
@@ -27,8 +27,8 @@ def swagger_handlers():
     return [
         URLSpec(prefix + r'spec.html$', SwaggerUIHandler,
                 default_settings, name=URL_SWAGGER_API_DOCS),
-        URLSpec(prefix + r'spec.json$', SwaggerResourcesHandler,
-                default_settings, name=URL_SWAGGER_API_LIST),
+        # URLSpec(prefix + r'spec.json$', SwaggerResourcesHandler,
+        #         default_settings, name=URL_SWAGGER_API_LIST),
         URLSpec(prefix + r'spec$', SwaggerApiHandler,
                 default_settings, name=URL_SWAGGER_API_SPEC),
         (prefix + r'(.*\.(css|png|gif|js))', StaticFileHandler,

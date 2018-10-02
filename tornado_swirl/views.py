@@ -25,37 +25,39 @@ class SwaggerUIHandler(tornado.web.RequestHandler):
 
     def get(self):
         discovery_url = urljoin(
-            self.request.full_url(), self.reverse_url(URL_SWAGGER_API_LIST))
+            self.request.full_url(), self.reverse_url(URL_SWAGGER_API_SPEC))
         self.render('index.html', discovery_url=discovery_url)
 
+# class SwaggerResourcesHandler(tornado.web.RequestHandler):
+#     def initialize(self, api_version, exclude_namespaces, **kwds):
+#         self.api_version = api_version
+#         self.exclude_namespaces = exclude_namespaces
 
-class SwaggerResourcesHandler(tornado.web.RequestHandler):
-    def initialize(self, api_version, exclude_namespaces, **kwds):
-        self.api_version = api_version
-        self.exclude_namespaces = exclude_namespaces
+#     def get(self):
+#         self.set_header('content-type', 'application/json')
+#         u = urlparse(self.request.full_url())
+#         resources = {
+#             'apiVersion': self.api_version,
+#             'openapi': SWAGGER_VERSION,
+#             'basePath': '%s://%s' % (u.scheme, u.netloc),
+#             'produces': ["application/json"],
+#             'description': 'Test Api Spec',
+#             'apis': [{
+#                 'path': self.reverse_url(URL_SWAGGER_API_SPEC),
+#                 'description': 'Test Api Spec'
+#             }]
+#         }
 
-    def get(self):
-        self.set_header('content-type', 'application/json')
-        u = urlparse(self.request.full_url())
-        resources = {
-            'apiVersion': self.api_version,
-            'openapi': SWAGGER_VERSION,
-            'basePath': '%s://%s' % (u.scheme, u.netloc),
-            'produces': ["application/json"],
-            'description': 'Test Api Spec',
-            'apis': [{
-                'path': self.reverse_url(URL_SWAGGER_API_SPEC),
-                'description': 'Test Api Spec'
-            }]
-        }
-
-        self.finish(json_dumps(resources, self.get_arguments('pretty')))
+#         self.finish(json_dumps(resources, self.get_arguments('pretty')))
 
 
 class SwaggerApiHandler(tornado.web.RequestHandler):
-    def initialize(self, api_version, base_url, **kwds):
+    def initialize(self, title, description, api_version, base_url, schemes, **kwds):
         self.api_version = api_version
         self.base_url = base_url
+        self.title = title
+        self.description = description
+        self.schemes = schemes
 
     def get(self):
         self.set_header('content-type', 'application/json')
@@ -63,22 +65,19 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         specs = {
             'openapi': SWAGGER_VERSION,
             'info': {
-                'title': "Sample API",
-                'description': "Foo bar",
+                'title': self.title,
+                'description': self.description,
                 'version': self.api_version,
             },
             'servers': [{"url": self.request.protocol + "://" + self.request.host + "/",
                          "description": "This server"
                          }],
-            'schemes': ["http", "https"],
-            'consumes': ['application/json'],
-            'produces': ['application/json'],
+            'schemes': self.schemes,
             'paths': {path: self.__get_api_spec(path, spec, operations)
                       for path, spec, operations in apis},
         }
 
         schemas = get_schemas()
-
         if schemas:
             specs.update(
                 {
@@ -86,7 +85,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                         "schemas": {
                             name: self.__get_schema_spec(schemaCls) for (name, schemaCls) in schemas.items()
                         }
-
                     }
                 }
             )
@@ -99,14 +97,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                  for (_, prop) in spec.properties.items()]
         required = [name for name, _, req in props if req]
 
-        val = {
-            "type": "object",
-        }
-
+        val = { "type": "object" }
         if required:
-            val.update({
-                "required": required
-            })
+            val.update({"required": required})
 
         val.update({
             "properties": {
@@ -322,12 +315,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def __get_type(self, param):
         if param.type == "array":
-            val =  {
-                        "type": "array",
-                        "items": {
-                            "type": param.itype  # TODO detect type
-                        }
-            }
+            val =  { "type": "array",
+                     "items": {
+                         "type": param.itype  # TODO detect type
+                     }
+                   }
             val.update(param.kwargs)
             return {"schema": val}
         if isinstance(param.itype, dict):
@@ -403,16 +395,3 @@ def _find_groups(url: str):
                 return (None, None)
             pieces.append(unescaped_fragment)
     return ''.join(pieces), regex.groups
-
-    # @staticmethod
-    # def find_api(host_handlers):
-    #     for _, handlers in host_handlers:
-    #         for spec in handlers:
-    #             for (_, member) in inspect.getmembers(spec.handler_class):
-    #                 if inspect.ismethod(member) and hasattr(member, 'path_spec'):
-    #                     spec_path = spec._path % tuple(
-    #                         ['{%s}' % arg for arg in member.func_args])
-    #                     operations = [member.path_spec for (name, member) in inspect.getmembers(spec.handler_class)
-    #                                   if hasattr(member, 'path_spec')]
-    #                     yield spec_path, spec, operations
-    #                     break

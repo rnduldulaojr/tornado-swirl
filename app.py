@@ -1,7 +1,9 @@
-from tornado_swirl.swagger import restapi, schema, Application
+from tornado_swirl.swagger import restapi, schema, Application, describe
 from tornado_swirl import api_routes
 import tornado.web
 import tornado.ioloop
+
+describe(title='Test API', description='Just things to test')
 
 @restapi(url="/test") 
 class MainHandler(tornado.web.RequestHandler):

@@ -169,7 +169,6 @@ FSM_MAP = (
      'callback': transition_process_buffer},
 )
 
-
 class ParseFSM:
     def __init__(self, fsm_map,  lines, spec='operation'):
         self.input_lines = lines + ["--THE END--"]
