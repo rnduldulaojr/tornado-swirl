@@ -51,7 +51,7 @@ Path Parameters:
 
     pp = path_spec.path_params.get('employee_uid')
     assert pp.name == 'employee_uid'
-    assert pp.type == 'int'
+    assert pp.type.name == 'integer'
     assert pp.ptype == "path"
     assert pp.description == 'The employee ID.'
     assert pp.required == True
@@ -76,7 +76,7 @@ Query Parameters:
     qp = path_spec.query_params.get("param1")
     assert qp is not None
     assert qp.name == "param1"
-    assert qp.type == "int"
+    assert qp.type.name == "integer"
     assert qp.ptype == "query"
     assert qp.required == False
     assert qp.description == "The param 1."
@@ -84,7 +84,7 @@ Query Parameters:
     qp2 = path_spec.query_params.get("param2")
     assert qp2 is not None
     assert qp2.name == "param2"
-    assert qp2.type == "Model"
+    assert qp2.type.name == "Model"
     assert qp2.required
     assert qp2.description == "The param 2."
 
@@ -111,7 +111,7 @@ Request Body:
     qp = path_spec.query_params.get("param1")
     assert qp is not None
     assert qp.name == "param1"
-    assert qp.type == "int"
+    assert qp.type.name == "integer"
     assert qp.ptype == "query"
     assert qp.required == False
     assert qp.description == "The param 1."
@@ -119,7 +119,7 @@ Request Body:
     qp2 = path_spec.query_params.get("param2")
     assert qp2 is not None
     assert qp2.name == "param2"
-    assert qp2.type == "Model"
+    assert qp2.type.name == "Model"
     assert qp2.required
     assert qp2.description == "The param 2."
 
@@ -153,7 +153,7 @@ Request Body:
     qp = path_spec.query_params.get("param1")
     assert qp is not None
     assert qp.name == "param1"
-    assert qp.type == "int"
+    assert qp.type.name == "integer"
     assert qp.ptype == "query"
     assert qp.required == False
     assert qp.description == "The param 1."
@@ -161,7 +161,7 @@ Request Body:
     qp2 = path_spec.query_params.get("param2")
     assert qp2 is not None
     assert qp2.name == "param2"
-    assert qp2.type == "Model"
+    assert qp2.type.name == "Model"
     assert qp2.required
     assert qp2.description == "The param 2."
 
@@ -171,7 +171,7 @@ Request Body:
     hp = path_spec.header_params.get("Authorization")
     assert hp is not None
     assert hp.name == "Authorization"
-    assert hp.type == "string"
+    assert hp.type.name == "string"
     assert hp.required
 
 
@@ -198,16 +198,17 @@ Request Body:
     qp = path_spec.query_params.get("param1")
     assert qp is not None
     assert qp.name == "param1"
-    assert qp.type == "array"
+    assert qp.type.name == "array"
+    assert qp.type.items_type.name == "integer"
     assert qp.ptype == "query"
-    assert qp.itype == "int"
+
     assert qp.required == False
     assert qp.description == "The param 1."
 
     qp2 = path_spec.query_params.get("param2")
     assert qp2 is not None
     assert qp2.name == "param2"
-    assert qp2.type == "Model"
+    assert qp2.type.name == "Model"
     assert qp2.required
     assert qp2.description == "The param 2."
 
@@ -218,7 +219,7 @@ Request Body:
     hp = path_spec.header_params.get("Authorization")
     assert hp is not None
     assert hp.name == "Authorization"
-    assert hp.type == "string"
+    assert hp.type.name == "string"
     assert hp.required
 
 
@@ -234,7 +235,7 @@ def test_cookie_section():
     cookie = path_spec.cookie_params.get("x")
     assert cookie is not None
     assert cookie.name == 'x'
-    assert cookie.type == 'string'
+    assert cookie.type.name == 'string'
     assert cookie.required
     assert cookie.description == 'Cookie monster raaa'
 
@@ -263,7 +264,6 @@ def test_response_200_alternate_format():
 
     assert path_spec.responses
     response = path_spec.responses.get("200")  # response ids are the http code
-    print(path_spec.responses)
     assert response
     assert response.description == "Response 200"
 
@@ -278,7 +278,6 @@ def test_response_201():
 
     assert path_spec.responses
     response = path_spec.responses.get("201")  # response ids are the http code
-    print(path_spec.responses)
     assert response
     assert response.description == "ACCEPTED"
 

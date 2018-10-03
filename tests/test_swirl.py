@@ -165,7 +165,6 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body)
-        print(response.body)
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']
@@ -198,7 +197,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body)
-        print(response.body)
+
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']
@@ -244,7 +243,6 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body)
-        print(response.body)
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']

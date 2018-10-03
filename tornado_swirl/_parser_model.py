@@ -33,41 +33,10 @@ class Param(object):
     def __init__(self, name, dtype='string', ptype='path',
                  required=False, description=None, order=0):
         self.name = name
-        if dtype:
-            self.type = dtype.strip()
-        else:
-            self.type = None
+        self.type = dtype
         self.ptype = ptype
         self.required = required
         self.description = description
         self.order = order
-        self.itype = None
         self.kwargs = {}
-        if self.type and self.type.startswith('[') and self.type.endswith(']'):
-            self.itype = self.type[1:-1]
-            self.type = "array"
-
-        elif self.type and self.type.startswith('enum[') and self.type.endswith(']'):
-            content = [c.strip() for c in
-                       self.type[self.type.find('[')+1:self.type.rfind(']')].split(',')]
-
-            self.itype = {
-                "enum": content
-            }
-            self.type = "string"
-        else:
-            colon = -1
-            if self.type:
-                colon = self.type.find(':')
-
-            if self.type and self.type.startswith('file'):
-                if colon == -1:
-                    self.itype = 'text/plain'
-                else:
-                    self.itype = self.type[colon+1:]
-                    colon = -1 #reset
-                self.type = "file"
-
-            if colon > -1:  #for example Model:application/json or Model:application/xml
-                self.itype = self.type[colon+1:]
-                self.type = self.type[:colon]
+        

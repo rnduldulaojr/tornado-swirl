@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 import tornado.template
 import tornado.web
 from tornado.util import re_unescape
+from tornado_swirl.openapi import types
 
 from .settings import (SWAGGER_VERSION, #URL_SWAGGER_API_LIST,
                        URL_SWAGGER_API_SPEC, api_routes, get_schemas,
@@ -133,7 +134,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 'description': api[1].description.strip(),
                 'parameters': self.__get_params(api[1]),
             }
-            print("Body Params: ", api[1].body_params)
+            #print("Body Params: ", api[1].body_params)
             if api[1].body_params:
                 paths[api[0]]["requestBody"] = self.__get_request_body(api[1])
 
@@ -141,13 +142,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return paths
 
     def __detect_content_from_type(self, val) -> (str, bool, str):
-        print(get_schemas().keys())
-        if val.type == "file":
-            return "file", False, val.itype
-        if val.type in get_schemas().keys():
-            return val.type, True, None
+        if val.type.name == "file":
+            return "file", False, val.type.contents
+        if val.type.name in get_schemas().keys():
+            return val.type.name, True, None
 
-        return val.type, False, None
+        return val.type.name, False, None
 
     def __get_params(self, path_spec):
         params = []
@@ -178,7 +178,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
             for (_, val) in path_spec.body_params.items():
                 content, ismodel, ftype = self.__detect_content_from_type(val)
-                print(content, ismodel, ftype)
                 if ftype is not None:
                     files_detected += 1
                 elif ismodel:
@@ -192,14 +191,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 contents[ctype] = {
                     "schema": {
                         "properties": {
-                            spec.name: self.__get_real_type(spec.type)['schema']
+                            spec.name: spec.type.schema
                             for spec in path_spec.body_params.values()
                         }
                     }
                 }
             elif files_detected == 1 and not form_data_detected and not models_detected:
                 entry = list(path_spec.body_params.values())[0]
-                contents[entry.itype] = {
+                contents[entry.type.contents] = {
                     "schema": {
                         "type": "string",
                         "format": "binary"  #TODO: When to use byte/base64?
@@ -211,15 +210,15 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 contents["multipart/form-data"] = {
                     "schema": {
                         "properties": {
-                            spec.name: self.__get_real_type(spec.type)['schema']
+                            spec.name: spec.type.schema
                             for spec in path_spec.body_params.values()
                         }
                     }
                 }
             elif models_detected == 1 and not files_detected and not form_data_detected:
-                file_entry = list(path_spec.body_params.values())[0]
-                file_type = file_entry.itype or 'application/json'
-                contents[file_type] = self.__get_type(file_entry)
+                params_entry = list(path_spec.body_params.values())[0]
+                file_type = 'application/json'
+                contents[file_type] = params_entry.type.schema
             else:
                 ctype = 'Unknown'
 
@@ -241,109 +240,25 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         return params
 
     def _detect_content(self, param):
+        if param.type.name == "None":
+            return None
 
-        if param.type not in ('integer', 'int', 'string', 'str', 'boolean', 'bool',
-                              'number', 'int32', 'int64', 'float', 'double', "byte",
-                              'binary', 'date', 'date-time', 'password'):
-            if param.type == "array":
-                return {
-                    "application/json": {
-                        "schema": {
-                            "type": "array",
-                            # TODO: apply refs
-                            "items": self.__get_real_type(param.itype)["schema"]
-                        }
-                    }
+        if param.type.name in ("integer", "number", "string", "boolean"):
+            return {
+                "text/plain": {
+                    "schema": param.type.schema
                 }
-
-            return {"application/json": self.__get_real_type(param.type)}
-        # TODO: other media types
+            }
         return {
-            "text/plain": {
-                "schema": {
-                    "type": param.type
+            "application/json": {
+                    "schema": param.type.schema
                 }
             }
-        }
 
-    def __get_real_type(self, typestr, **kwargs):
-        if typestr in ("int", "integer", "int32"):
-            val = {
-                "type": "integer",
-                "format": "int32"
-            }
-
-        elif typestr in ("long", "int64"):
-            val = {
-                "type": "integer",
-                "format": "int64"
-            }
-
-        elif typestr in ("float", "double"):
-            val = {
-                "type": "number",
-                "format": typestr
-            }
-
-        elif typestr in ("byte", "binary", "date", "password"):
-            val = {
-                "type": "string",
-                "format": typestr
-            }
-
-        elif typestr in ("dateTime", "date-time"):
-            val = {
-                "type": "string",
-                "format": "date-time"
-            }
-
-        elif typestr in ("str", "string"):
-            val = {
-                "type": "string"
-            }
-
-        elif typestr in ("bool", "boolean"):
-            val = {
-                "type": "boolean"
-            }
-
-        elif is_defined_schema(typestr):
-            val = {
-                "$ref": "#/components/schemas/" + typestr
-            }
-
-        elif typestr == "file":
-            val = {
-                "type": "string",
-                "format": "binary",
-            }
-        else:
-            val = {
-                "type": typestr
-            }
-
-        val.update(kwargs)
-        return {"schema": val}
-        # TODO check if typestr is a reference
+              
 
     def __get_type(self, param):
-        if param.type == "array":
-            val = {"type": "array",
-                   "items": {
-                       "type": param.itype  # TODO detect type
-                   }
-                  }
-            val.update(param.kwargs)
-            return {"schema": val}
-        if isinstance(param.itype, dict):
-            val = {
-                "type": param.type
-            }
-            val.update(param.itype)
-            return {"schema": val}
-        real_type = self.__get_real_type(
-            str(param.type).strip(), **param.kwargs)
-        return real_type
+        return {"schema": param.type.schema }
 
     @staticmethod
     def find_api():

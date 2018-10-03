@@ -132,6 +132,12 @@ And visit:
 curl http://localhost:8888/swagger/spec
 ```
 
+Or you can view via Swagger UI in your browser:
+
+```
+http://localhost:8888/swagger/spec.html
+```
+
 Swagger spec will look something like:
 
 ```json

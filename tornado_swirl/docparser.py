@@ -7,6 +7,7 @@ Returns:
 import numbers
 import re
 
+from tornado_swirl.openapi.types import Type
 from tornado_swirl._parser_model import Param, PathSpec, SchemaSpec
 
 _QUERY_HEADERS = 'query headers'
@@ -72,8 +73,9 @@ def _process_params(fsm_obj, ptype, required_func=None):
         matcher = PARAM_MATCHER.match(line.lstrip())
         if not matcher:
             continue
+        open_type = matcher.group('type')
         param = Param(name=matcher.group('name'),
-                      dtype=matcher.group('type'),
+                      dtype=Type(open_type),
                       ptype=ptype,
                       required=required_func(str(matcher.group('required')
                                                  ).lower(), "required"),
@@ -115,12 +117,12 @@ def _get_description_props(description: str):
 
 def _set_default_type(dval, dtype):
     for (name, param) in dval.items():
-        if not param.type:
+        if param.type.name == "None":
             dval[name].type = dtype
 
 def _process_query(fsm_obj, **kwargs):
     fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
-    _set_default_type(fsm_obj.spec.query_params, "string")
+    _set_default_type(fsm_obj.spec.query_params, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_body(fsm_obj, **kwargs):
@@ -128,25 +130,24 @@ def _process_body(fsm_obj, **kwargs):
     # TODO: change this
     fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
     #check the params and guess the content type
-    _set_default_type(fsm_obj.spec.body_params, "string")
+    _set_default_type(fsm_obj.spec.body_params, Type("string"))
     fsm_obj.buffer = ''
 
 def _process_cookie(fsm_obj, **kwargs):
     fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie", **kwargs)
-    _set_default_type(fsm_obj.spec.cookie_params, "string")
+    _set_default_type(fsm_obj.spec.cookie_params, Type("string"))
     fsm_obj.buffer = ""
 
 
 def _process_header(fsm_obj, **kwargs):
     fsm_obj.spec.header_params = _process_params(fsm_obj, "header", **kwargs)
     #convert all types to string if None
-    _set_default_type(fsm_obj.spec.header_params, "string")
+    _set_default_type(fsm_obj.spec.header_params, Type("string"))
     fsm_obj.buffer = ""
 
 
 def _process_response(fsm_obj, **kwargs):
     cur_code = kwargs.get('code', '200')
-    print("Cur_code: ", cur_code)
     res = _process_params(fsm_obj, "response")
     if res:
         item = list(res.values())[0]
@@ -158,7 +159,7 @@ def _process_response(fsm_obj, **kwargs):
 
 def _process_properties(fsm_obj, **kwargs):
     fsm_obj.spec.properties = _process_params(fsm_obj, "property")
-    _set_default_type(fsm_obj.spec.properties, "string")
+    _set_default_type(fsm_obj.spec.properties, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_errors(fsm_obj, **kwargs):
