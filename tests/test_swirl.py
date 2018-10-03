@@ -185,7 +185,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
                     file (file:text/csv) -- The file.
                     
                 
-                Response:
+                Returns:
                     out (string) -- An output.
 
                 Errors:

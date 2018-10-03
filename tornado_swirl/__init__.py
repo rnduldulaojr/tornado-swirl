@@ -3,5 +3,5 @@
 __author__ = 'serena'
 
 from tornado_swirl.settings import api_routes
-from tornado_swirl.swagger import Application
+from tornado_swirl.swagger import Application, describe, restapi, schema
 

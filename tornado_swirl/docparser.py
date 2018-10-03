@@ -184,10 +184,10 @@ _HEADERS = {
     _PATH_HEADERS: (r"(path|url) param(s|eter(s)?)?:", _process_path),
     _BODY_HEADERS: (r"(request\s*)? body:", _process_body),
     _COOKIE_HEADERS: (r"cookie(s|(\s*param(s|eter(s)?)?)?)?:", _process_cookie),
-    _HEADER_HEADERS: (r"(http\s*)?header(s)?:", _process_header),
+    _HEADER_HEADERS: (r"(http\s+)?(request\s+)?header(s)?:", _process_header),
     _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):",
                      _process_errors),
-    _RESPONSE_HEADERS: (r"((http\s+)?((?P<code>\d+)\s+))?response:", _process_response),
+    _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):", _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
 }
 
