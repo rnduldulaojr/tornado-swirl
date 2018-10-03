@@ -45,7 +45,7 @@ class User(object):
 
 
 def make_app():
-    return swirl.Application(api_routes())
+    return swirl.Application(swirl.api_routes())
 
 if __name__ == "__main__":
     app = make_app()
