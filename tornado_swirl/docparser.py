@@ -91,7 +91,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
 
 def _process_path(fsm_obj, **kwargs):
     fsm_obj.spec.path_params = _process_params(
-        fsm_obj, "path", lambda x, y: True)
+        fsm_obj, "path", lambda x, y: True, **kwargs)
     _set_default_type(fsm_obj.spec.path_params, "string")
     fsm_obj.buffer = ""
 
@@ -121,14 +121,14 @@ def _set_default_type(dval, dtype):
             dval[name].type = dtype
 
 def _process_query(fsm_obj, **kwargs):
-    fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
+    fsm_obj.spec.query_params = _process_params(fsm_obj, "query", **kwargs)
     _set_default_type(fsm_obj.spec.query_params, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_body(fsm_obj, **kwargs):
     # first merge lines without -- to previous lines
     # TODO: change this
-    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
+    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True, **kwargs)
     #check the params and guess the content type
     _set_default_type(fsm_obj.spec.body_params, Type("string"))
     fsm_obj.buffer = ''
@@ -158,12 +158,12 @@ def _process_response(fsm_obj, **kwargs):
     fsm_obj.buffer = ""
 
 def _process_properties(fsm_obj, **kwargs):
-    fsm_obj.spec.properties = _process_params(fsm_obj, "property")
+    fsm_obj.spec.properties = _process_params(fsm_obj, "property", **kwargs)
     _set_default_type(fsm_obj.spec.properties, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_errors(fsm_obj, **kwargs):
-    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
+    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response", **kwargs))
     fsm_obj.buffer = ""
 
 
