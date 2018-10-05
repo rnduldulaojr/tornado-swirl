@@ -1,6 +1,10 @@
+"""OpenAPI Types
+
+Use the Type class to determine the OpenAPI data type.
+
+"""
 
 class SchemaMixin(object):
-
     @property
     def schema(self):
         schema = {"type": self.name}
@@ -10,7 +14,6 @@ class SchemaMixin(object):
             print(self.kwargs)
             schema.update(self.kwargs)  # TODO: check the validity
         return schema
-
 
 class Type(object):
     """Represents an open api type"""
@@ -126,8 +129,6 @@ class BoolType(SchemaMixin):
 
 
 # simple Types
-
-
 class IntType(SchemaMixin):
     def __init__(self, name, format, **kwargs):
         self.name = "integer"
