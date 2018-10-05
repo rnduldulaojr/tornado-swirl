@@ -75,7 +75,6 @@ def _process_params(fsm_obj, ptype, required_func=None):
             continue
         open_type = matcher.group('type')
         param = Param(name=matcher.group('name'),
-                      dtype=Type(open_type),
                       ptype=ptype,
                       required=required_func(str(matcher.group('required')
                                                  ).lower(), "required"),
@@ -84,7 +83,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
         description = str(matcher.group('description')).strip()
         desc, kwargs = _get_description_props(description)
         param.description = desc.strip()
-        param.kwargs = kwargs
+        param.type = Type(open_type, **kwargs)
         params[param.name] = param
     return params
 

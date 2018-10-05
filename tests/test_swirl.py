@@ -249,3 +249,40 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['paths']['/test/form']['post']['requestBody']
         assert obj['paths']['/test/form']['post']['requestBody']['content']
         assert obj['paths']['/test/form']['post']['requestBody']['content']['application/json']
+
+    @gen_test
+    def test_simple_descriptions(self):
+        
+        @swirl.restapi('/test')
+        class HandlerTest(RequestHandler):
+            async def get(self):
+                """This is a simple test get.
+
+                This is a simple description.
+
+                Query Parameters:
+                    foo (string) -- Optional. Simple query string.
+                        example: bar
+                
+                Response:
+                    out (string) -- An output.
+                        example: foo
+                """
+                self.finish()
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['get']
+
+
+        obj = obj['paths']['/test']['get']
+        print(obj)
+        assert obj['responses']
+        assert obj['responses']['200']
+        assert obj['responses']['200']['description'] == 'An output.'
+        assert obj['responses']['200']['content']['text/plain']['schema']
+        assert obj['responses']['200']['content']['text/plain']['schema']['type'] == 'string'
+        assert obj['responses']['200']['content']['text/plain']['schema']['example'] == 'foo'

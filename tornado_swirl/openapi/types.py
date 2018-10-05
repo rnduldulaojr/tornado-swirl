@@ -7,6 +7,7 @@ class SchemaMixin(object):
         if self.format:
             schema.update({"format": self.format})
         if self.kwargs:
+            print(self.kwargs)
             schema.update(self.kwargs)  # TODO: check the validity
         return schema
 
@@ -76,6 +77,7 @@ class FileType(object):
     def __init__(self, contents, **kwargs):
         self.name = "file"
         self.contents = contents
+        self.kwargs = kwargs
 
     @property
     def schema(self):
@@ -86,6 +88,7 @@ class ArrayType(object):
     def __init__(self, contents, **kwargs):
         self.name = "array"
         self.items_type = Type(contents)
+        self.kwargs = kwargs
 
     @property
     def schema(self):
@@ -106,21 +109,20 @@ class CombineType(object):
 
 
 class NoneType(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.name = "None"
+        self.kwargs = kwargs
 
     @property
     def schema(self):
         return None
 
 
-class BoolType(object):
-    def __init__(self):
+class BoolType(SchemaMixin):
+    def __init__(self, **kwargs):
         self.name = 'boolean'
+        self.kwargs = kwargs
 
-    @property
-    def schema(self):
-        return {"type": "boolean"}
 
 # simple Types
 

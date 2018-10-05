@@ -364,4 +364,4 @@ def test_param_props():
     assert path_spec.properties.get('name')
     assert path_spec.properties.get('age')
     assert path_spec.properties.get('age').description.strip() == 'The age.'
-    assert path_spec.properties.get('age').kwargs.get('minimum') == 1
+    assert path_spec.properties.get('age').type.kwargs.get('minimum') == 1
