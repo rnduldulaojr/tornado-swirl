@@ -148,7 +148,7 @@ def _process_header(fsm_obj, **kwargs):
 
 def _process_response(fsm_obj, **kwargs):
     cur_code = kwargs.get('code', '200')
-    res = _process_params(fsm_obj, "response")
+    res = _process_params(fsm_obj, "response", **kwargs)
     if res:
         item = list(res.values())[0]
         item.name = cur_code
