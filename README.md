@@ -8,6 +8,10 @@ The main idea for this project is to automatically extract API specs from the us
 
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
+## Current Release:
+
+* v. 0.1.2 -- Fixed openapi package inclusion
+
 [Tutorial and More Details Here](./TUTORIAL.md)
 
 ## Quick Look

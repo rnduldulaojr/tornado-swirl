@@ -116,7 +116,7 @@ class NoneType(object):
 
 class BoolType(object):
     def __init__(self):
-        pass
+        self.name = 'boolean'
 
     @property
     def schema(self):
