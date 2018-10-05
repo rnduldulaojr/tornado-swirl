@@ -11,7 +11,7 @@ from tornado_swirl.settings import add_api_handler, add_route, add_schema, defau
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
     return (inspect.isfunction(obj) or inspect.ismethod(obj)) and \
-            obj.__name__ in ('get', 'post', 'put', 'delete')
+            obj.__name__ in ('get', 'post', 'put', 'delete', 'patch')
 
 
 def restapi(url, **kwargs):
