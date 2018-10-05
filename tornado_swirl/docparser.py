@@ -91,7 +91,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
 
 def _process_path(fsm_obj, **kwargs):
     fsm_obj.spec.path_params = _process_params(
-        fsm_obj, "path", lambda x, y: True, **kwargs)
+        fsm_obj, "path", lambda x, y: True)
     _set_default_type(fsm_obj.spec.path_params, "string")
     fsm_obj.buffer = ""
 
@@ -121,26 +121,26 @@ def _set_default_type(dval, dtype):
             dval[name].type = dtype
 
 def _process_query(fsm_obj, **kwargs):
-    fsm_obj.spec.query_params = _process_params(fsm_obj, "query", **kwargs)
+    fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
     _set_default_type(fsm_obj.spec.query_params, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_body(fsm_obj, **kwargs):
     # first merge lines without -- to previous lines
     # TODO: change this
-    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True, **kwargs)
+    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
     #check the params and guess the content type
     _set_default_type(fsm_obj.spec.body_params, Type("string"))
     fsm_obj.buffer = ''
 
 def _process_cookie(fsm_obj, **kwargs):
-    fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie", **kwargs)
+    fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie")
     _set_default_type(fsm_obj.spec.cookie_params, Type("string"))
     fsm_obj.buffer = ""
 
 
 def _process_header(fsm_obj, **kwargs):
-    fsm_obj.spec.header_params = _process_params(fsm_obj, "header", **kwargs)
+    fsm_obj.spec.header_params = _process_params(fsm_obj, "header")
     #convert all types to string if None
     _set_default_type(fsm_obj.spec.header_params, Type("string"))
     fsm_obj.buffer = ""
@@ -148,7 +148,7 @@ def _process_header(fsm_obj, **kwargs):
 
 def _process_response(fsm_obj, **kwargs):
     cur_code = kwargs.get('code', '200')
-    res = _process_params(fsm_obj, "response", **kwargs)
+    res = _process_params(fsm_obj, "response")
     if res:
         item = list(res.values())[0]
         item.name = cur_code
@@ -158,12 +158,12 @@ def _process_response(fsm_obj, **kwargs):
     fsm_obj.buffer = ""
 
 def _process_properties(fsm_obj, **kwargs):
-    fsm_obj.spec.properties = _process_params(fsm_obj, "property", **kwargs)
+    fsm_obj.spec.properties = _process_params(fsm_obj, "property")
     _set_default_type(fsm_obj.spec.properties, Type("string"))
     fsm_obj.buffer = ""
 
 def _process_errors(fsm_obj, **kwargs):
-    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response", **kwargs))
+    fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
     fsm_obj.buffer = ""
 
 
