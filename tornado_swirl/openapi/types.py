@@ -122,6 +122,7 @@ class BoolType(SchemaMixin):
     def __init__(self, **kwargs):
         self.name = 'boolean'
         self.kwargs = kwargs
+        self.format = None
 
 
 # simple Types
