@@ -237,7 +237,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                         # should return default produces if none, otherwise detect from type
                         self._detect_content(param)
                 }
-
                 # TODO: implement examples
         return params
 
@@ -256,8 +255,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                     "schema": param.type.schema
                 }
             }
-
-              
 
     def __get_type(self, param):
         return {"schema": param.type.schema }

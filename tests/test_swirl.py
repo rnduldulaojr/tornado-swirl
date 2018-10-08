@@ -286,3 +286,36 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['responses']['200']['content']['text/plain']['schema']
         assert obj['responses']['200']['content']['text/plain']['schema']['type'] == 'string'
         assert obj['responses']['200']['content']['text/plain']['schema']['example'] == 'foo'
+
+
+    @gen_test
+    def test_simple_parse_with_multipart_request_body(self):
+
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            async def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Request Body:
+                    file (file:image/png) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+
+        
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['requestBody']
+        assert obj['paths']['/test']['post']['requestBody']['content']
+        assert obj['paths']['/test']['post']['requestBody']['content']["multipart/form-data"]
+        
