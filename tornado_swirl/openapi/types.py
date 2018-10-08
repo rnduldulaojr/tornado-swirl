@@ -23,7 +23,9 @@ class Type(object):
         return instance if instance else super(Type, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, val, *args, **kwargs):
-        pass
+        self.name = val
+        self.format = None
+        self.kwargs = kwargs
 
     @staticmethod
     def _determine_type(val: str, **kwargs):

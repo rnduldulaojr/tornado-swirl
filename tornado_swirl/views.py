@@ -218,7 +218,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             elif models_detected == 1 and not files_detected and not form_data_detected:
                 params_entry = list(path_spec.body_params.values())[0]
                 file_type = 'application/json'
-                contents[file_type] = params_entry.type.schema
+                contents[file_type] = {
+                    "schema":  params_entry.type.schema
+                }
             else:
                 ctype = 'Unknown'
 
