@@ -49,7 +49,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            py.test --cov=.
+            py.test --cov=. -p no:warnings
 
       - store_artifacts:
           path: test-reports
