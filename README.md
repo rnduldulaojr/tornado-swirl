@@ -12,6 +12,7 @@ Swirl uses the ```@restapi``` decorator to get both the routing info AND the swa
 
 ## Current Release:
 
+* v. 0.1.5 -- Fixed bug where ```application/json``` response has no ```schema``` attribute.
 * v. 0.1.2 -- Fixed openapi package inclusion
 
 [Tutorial and More Details Here](./TUTORIAL.md)
