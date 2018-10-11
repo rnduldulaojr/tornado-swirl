@@ -49,8 +49,8 @@ class Boolean(object):
 
 
 _PROPS_TYPE_LOOKUP = {
-    Boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems'),
-    Number: ('minimum', 'maximum', 'multipleOf', 'minItems', 'maxItems')
+    Boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems', 'allowEmptyValue', 'deprecated'),
+    Number: ('minimum', 'maximum', 'multipleOf', 'minItems', 'maxItems', 'maxLength', 'minLength', 'uniqueItems', 'minProperties', 'maxProperties')
 }
 
 def _lookup_type_of(name):

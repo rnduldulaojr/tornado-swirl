@@ -11,7 +11,6 @@ class SchemaMixin(object):
         if self.format:
             schema.update({"format": self.format})
         if self.kwargs:
-            print(self.kwargs)
             schema.update(self.kwargs)  # TODO: check the validity
         return schema
 
