@@ -49,8 +49,11 @@ class Boolean(object):
 
 
 _PROPS_TYPE_LOOKUP = {
-    Boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems'),
-    Number: ('minimum', 'maximum', 'multipleOf', 'minItems', 'maxItems')
+    Boolean: ('exclusiveMinimum', 'exclusiveMaximum', 'uniqueItems',
+              'allowEmptyValue', 'deprecated'),
+    Number: ('minimum', 'maximum', 'multipleOf', 'minItems',
+             'maxItems', 'maxLength', 'minLength', 'uniqueItems',
+             'minProperties', 'maxProperties')
 }
 
 def _lookup_type_of(name):
@@ -125,8 +128,6 @@ def _process_query(fsm_obj, **kwargs):
     fsm_obj.buffer = ""
 
 def _process_body(fsm_obj, **kwargs):
-    # first merge lines without -- to previous lines
-    # TODO: change this
     fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
     #check the params and guess the content type
     _set_default_type(fsm_obj.spec.body_params, Type("string"))

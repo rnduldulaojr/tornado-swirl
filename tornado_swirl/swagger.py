@@ -5,8 +5,7 @@ import tornado.web
 
 from tornado_swirl import docparser
 from tornado_swirl.handlers import swagger_handlers
-from tornado_swirl.settings import add_api_handler, add_route, add_schema, default_settings
-
+import tornado_swirl.settings as settings
 
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
@@ -29,8 +28,8 @@ def restapi(url, **kwargs):
             if path_spec:
                 setattr(member, 'path_spec', path_spec)
                 cls.tagged_api_comps.append(name)
-        add_api_handler(cls)
-        add_route(url, cls, **kwargs)
+        settings.add_api_handler(cls)
+        settings.add_route(url, cls, **kwargs)
         return cls
     return _real_decorator
 
@@ -42,19 +41,19 @@ def schema(cls):
     model_spec = docparser.parse_from_docstring(doc, spec='schema')
     if model_spec:
         cls.schema_spec = model_spec
-        add_schema(name, cls)
+        settings.add_schema(name, cls)
     return cls
 
-def describe(title='Sample API', description='Sample description', **kwargs):
+def describe(title='Your API', description='No description', **kwargs):
     """Describe API"""
-    default_settings.update({"title": title, "description": description})
+    settings.default_settings.update({"title": title, "description": description})
     if kwargs:
-        default_settings.update(kwargs)
+        settings.default_settings.update(kwargs)
 
 class Application(tornado.web.Application):
     """Swirl Application class"""
 
-    def __init__(self, handlers=None, default_host="", transforms=None, **settings):
+    def __init__(self, handlers=None, default_host="", transforms=None, **kwargs):
         super(Application, self).__init__(
             (swagger_handlers() + handlers) if handlers else swagger_handlers(),
-            default_host, transforms, **settings)
+            default_host, transforms, **kwargs)
