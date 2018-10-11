@@ -53,7 +53,7 @@ def describe(title='Your API', description='No description', **kwargs):
 class Application(tornado.web.Application):
     """Swirl Application class"""
 
-    def __init__(self, handlers=None, default_host="", transforms=None, **settings):
+    def __init__(self, handlers=None, default_host="", transforms=None, **kwargs):
         super(Application, self).__init__(
             (swagger_handlers() + handlers) if handlers else swagger_handlers(),
-            default_host, transforms, **settings)
+            default_host, transforms, **kwargs)

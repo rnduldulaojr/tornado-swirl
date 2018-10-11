@@ -1,11 +1,12 @@
-from tornado_swirl.swagger import restapi, schema, Application, describe
-from tornado_swirl import api_routes
-import tornado.web
 import tornado.ioloop
+import tornado.web
+
+from tornado_swirl import api_routes
+from tornado_swirl.swagger import Application, describe, restapi, schema
 
 describe(title='Test API', description='Just things to test')
 
-# @restapi(url="/test") 
+# @restapi(url="/test")
 # class MainHandler(tornado.web.RequestHandler):
 #     """Foo"""
 
@@ -41,10 +42,10 @@ describe(title='Test API', description='Just things to test')
 
 #         200 Response:
 #             test ([User]) -- Test data
-        
+
 #         201 Response:
 #             test (User) -- Test user
-        
+
 #         Error Response:
 #             400  -- Fudge
 #         """
@@ -134,7 +135,7 @@ describe(title='Test API', description='Just things to test')
 
 # @schema
 # class User(object):
-#     """User 
+#     """User
 
 #     User def
 
@@ -154,18 +155,19 @@ class MyHandler(tornado.web.RequestHandler):
 
         Query Parameters:
             date (date) -- Required.  The target date.
-            sort (enum[asc, desc]) -- Optional.  Sort order. 
+            sort (enum[asc, desc]) -- Optional.  Sort order.
             items (int) -- Optional.  Number of items to display.
                 minimum: 100    maximum: 200
-        
+
         Returns:
             items ([string]) -- List of random strings.
-        
+
         Error Responses:
             400 (ErrorResponse) -- Bad Request.
             500 (ErrorResponse) -- Internal Server Error.
         """
         self.finish()
+
 
 @schema
 class ErrorResponse(object):
@@ -177,8 +179,10 @@ class ErrorResponse(object):
     """
     pass
 
+
 def make_app():
     return Application(api_routes(), autoreload=True)
+
 
 if __name__ == "__main__":
     app = make_app()

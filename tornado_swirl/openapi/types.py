@@ -5,8 +5,10 @@ Use the Type class to determine the OpenAPI data type.
 """
 
 class SchemaMixin(object):
+    """Schema mixin type for schema value"""
     @property
     def schema(self):
+        """Gets the type schema details"""
         schema = {"type": self.name}
         if self.format:
             schema.update({"format": self.format})
@@ -21,7 +23,7 @@ class Type(object):
         instance = Type._determine_type(str(val).strip(), **kwargs)
         return instance if instance else super(Type, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, val, *args, **kwargs):
+    def __init__(self, val, **kwargs):
         self.name = val
         self.format = None
         self.kwargs = kwargs
@@ -74,10 +76,12 @@ class Type(object):
 
     @property
     def schema(self):
+        """Override"""
         pass  # need to override at the subclass
 
 
 class FileType(object):
+    """File type"""
     def __init__(self, contents, **kwargs):
         self.name = "file"
         self.contents = contents
@@ -85,10 +89,12 @@ class FileType(object):
 
     @property
     def schema(self):
+        """Returns file schema details"""
         return {"type": "string", "format": "binary"}
 
 
 class ArrayType(object):
+    """Array/List type"""
     def __init__(self, contents, **kwargs):
         self.name = "array"
         self.items_type = Type(contents)
@@ -96,10 +102,12 @@ class ArrayType(object):
 
     @property
     def schema(self):
+        """Returns array schema details"""
         return {"type": "array", "items": self.items_type.schema}
 
 
 class CombineType(object):
+    """Combine type: anyof allof oneof not"""
     def __init__(self, name, contents, **kwargs):
         self.name = name
         self.vals = []
@@ -109,20 +117,24 @@ class CombineType(object):
 
     @property
     def schema(self):
+        """Returns combine type schema"""
         return {self.name: [x.schema for x in self.vals]}
 
 
 class NoneType(object):
+    """None type for None/null"""
     def __init__(self, **kwargs):
         self.name = "None"
         self.kwargs = kwargs
 
     @property
     def schema(self):
+        """Schema none"""
         return None
 
 
 class BoolType(SchemaMixin):
+    """Boolean type"""
     def __init__(self, **kwargs):
         self.name = 'boolean'
         self.kwargs = kwargs
@@ -131,42 +143,46 @@ class BoolType(SchemaMixin):
 
 # simple Types
 class IntType(SchemaMixin):
-    def __init__(self, name, format, **kwargs):
+    """Integer type"""
+    def __init__(self, name, dformat, **kwargs):
         self.name = "integer"
         self.format = None
         if name == "long":
             self.format = "int64"
         elif name in ("int32", "int64"):
             self.format = name
-        elif format:
-            self.format = format  # TODO: check format value
+        elif dformat:
+            self.format = dformat  # TODO: check format value
         self.kwargs = kwargs
 
 
 class NumberType(SchemaMixin):
-    def __init__(self, name, format, **kwargs):
+    """Number Type"""
+    def __init__(self, name, dformat, **kwargs):
         self.name = "number"
         self.format = None
         if name in ("float", "double"):
             self.format = name
-        elif format:
-            self.format = format
+        elif dformat:
+            self.format = dformat
         self.kwargs = kwargs
 
 
 class StringType(SchemaMixin):
-    def __init__(self, name, format, **kwargs):
+    """String type"""
+    def __init__(self, name, dformat, **kwargs):
         self.name = "string"
         self.format = None
         if name in ("date", "date-time", "password", "byte", "binary", "email",
                     "uuid", "uri", "hostname", "ipv4", "ipv6"):
             self.format = name
-        elif format:
-            self.format = format
+        elif dformat:
+            self.format = dformat
         self.kwargs = kwargs
 
 
 class EnumType(SchemaMixin):
+    """Enum type"""
     def __init__(self, values):
         self.name = "string"
         self.format = None
@@ -176,9 +192,11 @@ class EnumType(SchemaMixin):
 
 
 class ModelType(object):
+    """Model type"""
     def __init__(self, name):
         self.name = name
 
     @property
     def schema(self):
+        """Model schema ref"""
         return {"$ref": "#/components/schemas/" + self.name}

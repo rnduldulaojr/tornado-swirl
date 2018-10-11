@@ -403,3 +403,58 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj["servers"][0]["url"]
         assert obj["servers"][0]["description"]
         assert obj["servers"][0]["description"] == "Default server"
+
+
+    @gen_test
+    def test_simple_parse_with_urlencoded_request_body(self):
+
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            async def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Request Body:
+                    foo  (string) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body)
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['requestBody']
+        assert obj['paths']['/test']['post']['requestBody']['content']
+        assert obj['paths']['/test']['post']['requestBody']['content']["application/x-www-form-urlencoded"]
+
+
+    @gen_test
+    def test_spec_html(self):
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            async def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Request Body:
+                    foo  (string) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec.html'))
+        assert response.code == 200
+

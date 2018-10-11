@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Swirl Handlers/Views"""
 import inspect
 import json
 import re
@@ -7,7 +8,6 @@ from urllib.parse import urljoin
 import tornado.template
 import tornado.web
 from tornado.util import re_unescape
-from tornado_swirl.openapi import types
 
 import tornado_swirl.settings as settings
 
@@ -15,7 +15,12 @@ __author__ = 'rduldulao'
 
 
 def json_dumps(obj, pretty=False):
-    return json.dumps(obj, sort_keys=True, indent=4, separators=(',', ': ')) if pretty else json.dumps(obj)
+    """REturns JSON string"""
+    return json.dumps(obj,
+                      sort_keys=True,
+                      indent=4,
+                      separators=(',', ': ')) \
+                      if pretty else json.dumps(obj)
 
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
@@ -63,14 +68,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         apis = self.find_api()  # this is a generator
         servers = []
         server_settings = settings.default_settings.get("servers")
-        
+
         for server in server_settings:
             for key in list(server.keys()):
                 if key not in ('url', 'description'):
                     server.pop(key, None)
             if server:
                 servers.append(server)
-        
+
         if not servers:
             server_host = self.request.host.split(',')[0]
             servers = [{
@@ -181,7 +186,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             models_detected = 0 #application/json or application/xml
 
             for (_, val) in path_spec.body_params.items():
-                content, ismodel, ftype = self.__detect_content_from_type(val)
+                _, ismodel, ftype = self.__detect_content_from_type(val)
                 if ftype is not None:
                     files_detected += 1
                 elif ismodel:
@@ -249,24 +254,16 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             return None
 
         if param.type.name in ("integer", "number", "string", "boolean"):
-            return {
-                "text/plain": {
-                    "schema": param.type.schema
-                }
-            }
-        return {
-            "application/json": {
-                    "schema": param.type.schema
-                }
-            }
+            return {"text/plain": {"schema": param.type.schema}}
+        return {"application/json": {"schema": param.type.schema}}
 
     def __get_type(self, param):
         return {"schema": param.type.schema}
 
     @staticmethod
     def find_api():
+        """Gets the API specs"""
         for route_spec in settings.api_routes():
-            # TODO decorate  url
             url, _ = _find_groups(route_spec[0])
             path = url
             spec = route_spec[1]

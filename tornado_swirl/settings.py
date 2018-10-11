@@ -24,38 +24,36 @@ default_settings = {
     'exclude_namespaces': [],
 }
 
-_SCHEMAS = dict()
-
-_ROUTES = []
-
-_API_HANDLERS = []
+class SwirlVars(object):
+    """Container for swirl handler vars"""
+    SCHEMAS = dict()
+    ROUTES = []
+    API_HANDLERS = []
 
 def get_api_handlers() -> list:
     """Returns REST API handlers"""
-    return _API_HANDLERS
+    return SwirlVars.API_HANDLERS
 
 def add_api_handler(cls):
     """Adds a REST API handler class"""
-    _API_HANDLERS.append(cls)
+    SwirlVars.API_HANDLERS.append(cls)
 
 def add_route(path, handler, **kwargs):
     """Add a REST API route."""
-    _ROUTES.append((path, handler, kwargs))
+    SwirlVars.ROUTES.append((path, handler, kwargs))
 
 def api_routes():
     """Return all registered REST API routes via @restapi decorator"""
-    return _ROUTES
+    return SwirlVars.ROUTES
 
 def get_schemas() -> dict:
     """Return all registered REST API models via @schema decorator"""
-    return _SCHEMAS
+    return SwirlVars.SCHEMAS
 
 def is_defined_schema(name):
     """Returns True if named schema is registered."""
-    global _SCHEMAS
-    return True if _SCHEMAS.get(name) else False
+    return True if SwirlVars.SCHEMAS.get(name) else False
 
 def add_schema(name, cls):
     """Add a schema"""
-    global _SCHEMAS
-    _SCHEMAS[name] = cls
+    SwirlVars.SCHEMAS[name] = cls
