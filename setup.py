@@ -32,5 +32,5 @@ setup(name='tornado-swirl',
         'Programming Language :: Python :: 3.7'
       ],
       keywords=['SWAGGER', 'OPENAPI', 'TORNADO'],
-      download_url='https://github.com/rduldulao/tornado-swirl/archive/v_0.1.5.tar.gz',
+      download_url='https://github.com/rduldulao/tornado-swirl/archive/v_0.1.6.tar.gz',
 )
