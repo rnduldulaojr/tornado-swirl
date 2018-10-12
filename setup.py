@@ -8,7 +8,7 @@ with open('README') as file:
 
 setup(name='tornado-swirl',
       python_requires='>=3.7.0',
-      version='0.1.6',
+      version='0.1.7',
       url='https://github.com/rduldulao/tornado-swirl',
       zip_safe=False,
       packages=['tornado_swirl'],
@@ -32,5 +32,5 @@ setup(name='tornado-swirl',
         'Programming Language :: Python :: 3.7'
       ],
       keywords=['SWAGGER', 'OPENAPI', 'TORNADO'],
-      download_url='https://github.com/rduldulao/tornado-swirl/archive/v_0.1.6.tar.gz',
+      download_url='https://github.com/rduldulao/tornado-swirl/archive/v_0.1.7.tar.gz',
 )
