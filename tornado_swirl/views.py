@@ -78,7 +78,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         if not servers:
             server_host = self.request.host.split(',')[0]
-            proto = self.request.headers.get("X-Forwarded-Proto", None) or self.request.protocol
+            forwarded = self.request.headers.get('Forwarded', None)
+            proto = None
+            if forwarded:
+                protopart = [part.strip() for part in forwarded.split(';') if part.strip().startswith('proto')]
+                if protopart:
+                    proto = protopart[0].split('=')[-1]
+
+            proto = proto or self.request.headers.get("X-Forwarded-Proto", None) or self.request.protocol
             servers = [{
                 'url': proto + "://" + server_host + "/",
                 'description': 'Default server'
