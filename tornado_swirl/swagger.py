@@ -50,6 +50,9 @@ def describe(title='Your API', description='No description', **kwargs):
     if kwargs:
         settings.default_settings.update(kwargs)
 
+def add_global_tag(name, description=None, url=None):
+    settings.add_global_tag(name, description, url)
+
 class Application(tornado.web.Application):
     """Swirl Application class"""
 

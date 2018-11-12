@@ -15,6 +15,7 @@ class PathSpec(object):
         self.cookie_params = {}
         self.responses = {}
         self.properties = {}
+        self.tags = {}
 
 
 class SchemaSpec(object):

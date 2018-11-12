@@ -25,6 +25,7 @@ For example:
 import tornado_swirl as swirl
 
 swirl.describe(title='Test API', description='Just things to test')
+swirl.add_global_tag(name='MyTag', description='my tag description', url='http://foo.com/tags')
 
 @swirl.restapi('/path/to/api')
 class MyHandler(tornado.web.RequestHandler):
@@ -45,6 +46,9 @@ class MyHandler(tornado.web.RequestHandler):
         Error Responses:
             400 (ErrorResponse) -- Bad Request.
             500 (ErrorResponse) -- Internal Server Error.
+
+        Tags:
+            MyTag
         """
         self.finish()
 
@@ -136,12 +140,19 @@ Then view the API spec by pointing your browser to ```http://localhost:8888/swag
                 "responses": {
                     "200": {
                         "description": "List of random strings.",
+
                         "content": {
+
                             "application/json": {
+
                                 "schema": {
+
                                     "type": "array",
+
                                     "items": {
+
                                         "type": "string"
+
                                     }
                                 }
                             }
@@ -156,9 +167,21 @@ Then view the API spec by pointing your browser to ```http://localhost:8888/swag
                         "content": null
                     }
                 }
+                "tags": [
+                    "MyTag"
+                ]
             }
         }
     },
+    "tags": [
+        { 
+            "name": "MyTag",
+            "description": "my tag description",
+            "externalDocs": {
+                "url": "http://foo.com/tags"
+            }
+        }
+    ],
     "components": {
         "schemas": {
             "ErrorResponse": {
@@ -217,6 +240,7 @@ The section headers have definite possible values that are case insensitive.  Fo
 | HTTP Response | ^((http\s+)?((?P<code>\d+)\s+))?response:$ | ```HTTP 200 Response:```, ```201 Response:```,  ```Response:``` (Default 200) |
 | HTTP Error Response | ^(error(s\|\s\*response(s)?)?\|default(\s\*response(s)?)):$ | ```Errors:```, ```Error Responses:```, ```Default:``` |
 | Model Properties | ^(propert(y\|ies):)$ | ```Properties:``` or ```Property:``` |
+| Tags | ^tags:$ | ```Tags:``` |
 
 TODO: HTTP Response Headers.
 
@@ -424,6 +448,27 @@ Errors:
 
 """
 ```
+
+## Tags
+
+You can define a global tag using the `add_global_tag` function:
+
+```python
+swagger.add_global_tag(name='yourtag', description='desc', url='http://foo.com/tags')
+```
+
+`description` and `url` parameters are optional.
+
+To apply a tag to your handler method, add a `Tags:` or `Tag:` section where the tags are defined one tag per line.
+
+```python
+"""With tag!
+
+Tag:
+    mytag
+"""
+```
+
 ## Documenting Schemas
 
 To mark a class as a component schema, just use the Swirl @schema decorator.

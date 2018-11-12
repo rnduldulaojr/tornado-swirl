@@ -18,6 +18,7 @@ _HEADER_HEADERS = 'headers'
 _ERROR_HEADERS = 'errors'
 _RESPONSE_HEADERS = 'responses'
 _PROPERTY_HEADERS = 'properties'
+_TAGS_HEADERS = 'tags'
 
 #data processors
 # objects
@@ -166,6 +167,10 @@ def _process_errors(fsm_obj, **kwargs):
     fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
     fsm_obj.buffer = ""
 
+def _process_tags(fsm_obj, **kwargs):
+    fsm_obj.spec.tags = _process_params(fsm_obj, "tags")
+    _set_default_type(fsm_obj.spec.tags, Type("string"))
+    fsm_obj.buffer = ""
 
 def _clean_lines(lines: []):
     cleaned_lines, lines = [lines[0].strip()], lines[1:]
@@ -189,6 +194,7 @@ _HEADERS = {
                      _process_errors),
     _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):", _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
+    _TAGS_HEADERS:(r"tag(s?):", _process_tags)
 }
 
 _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
@@ -266,7 +272,6 @@ def _transition_description(fsm_obj):
 
 # conditions
 
-
 def _is_generic_line(line):
     line = line.strip()
     if _SECTION_HEADER_REGEX.match(line):
@@ -296,10 +301,6 @@ def _is_generic_line_or_blank(line):
 def _is_section_header(line):
     #print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
     return True if _SECTION_HEADER_REGEX.match(line.strip()) else False
-
-
-
-
 
 
 FSM_MAP = (
