@@ -22,6 +22,7 @@ default_settings = {
     'api_key': '',
     'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
     'exclude_namespaces': [],
+    'tags': [],
 }
 
 class SwirlVars(object):
@@ -29,10 +30,21 @@ class SwirlVars(object):
     SCHEMAS = dict()
     ROUTES = []
     API_HANDLERS = []
+    GLOBAL_TAGS = []
 
 def get_api_handlers() -> list:
     """Returns REST API handlers"""
     return SwirlVars.API_HANDLERS
+
+def add_global_tag(name, description=None, url=None):
+    tag = {}
+    tag['name'] = name
+    if description:
+        tag['description'] = description
+    
+    if url:
+        tag['externalDocs'] = { 'url': url }
+    SwirlVars.GLOBAL_TAGS.append(tag)
 
 def add_api_handler(cls):
     """Adds a REST API handler class"""

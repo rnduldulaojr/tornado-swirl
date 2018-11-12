@@ -8,7 +8,7 @@ with open('README') as file:
 
 setup(name='tornado-swirl',
       python_requires='>=3.7.0',
-      version='0.1.7',
+      version='0.1.8',
       url='https://github.com/rduldulao/tornado-swirl',
       zip_safe=False,
       packages=['tornado_swirl'],

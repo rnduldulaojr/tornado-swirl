@@ -164,6 +164,9 @@ class MyHandler(tornado.web.RequestHandler):
         Error Responses:
             400 (ErrorResponse) -- Bad Request.
             500 (ErrorResponse) -- Internal Server Error.
+
+        Tags:
+            internal
         """
         self.finish()
 

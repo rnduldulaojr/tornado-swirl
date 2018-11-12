@@ -11,6 +11,7 @@ The main idea for this project is to automatically extract API specs from the us
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
 ## Current Release:
+* v. 0.1.8 -- Support `tags` OpenAPI property.  
 * v. 0.1.7 -- Fixed bug where multiple host value (comma delimited) appears on ```servers``` value.  Also modified ```swirl.describe``` behavior.
 * v. 0.1.5 -- Fixed bug where ```application/json``` response has no ```schema``` attribute.
 * v. 0.1.2 -- Fixed openapi package inclusion
@@ -33,6 +34,9 @@ class ItemHandler(tornado.web.RequestHandler):
 
         Path Parameter:
             itemid (int) -- The item id
+        
+        Tags:
+            items
         """
         pass
 
@@ -48,7 +52,6 @@ class User(object):
 
     """
     pass
-
 
 
 def make_app():

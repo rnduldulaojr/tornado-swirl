@@ -2,9 +2,10 @@ import tornado.ioloop
 import tornado.web
 
 from tornado_swirl import api_routes
-from tornado_swirl.swagger import Application, describe, restapi, schema
+from tornado_swirl.swagger import Application, describe, restapi, schema, add_global_tag
 
 describe(title='Test API', description='Just things to test')
+add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
 
 # @restapi(url="/test")
 # class MainHandler(tornado.web.RequestHandler):
@@ -165,6 +166,9 @@ class MyHandler(tornado.web.RequestHandler):
         Error Responses:
             400 (ErrorResponse) -- Bad Request.
             500 (ErrorResponse) -- Internal Server Error.
+
+         Tags:
+            internal
         """
         self.finish()
 

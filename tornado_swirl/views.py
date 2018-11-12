@@ -103,6 +103,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                       for path, spec, operations in apis},
         }
 
+        if settings.SwirlVars.GLOBAL_TAGS:
+            specs['tags'] = settings.SwirlVars.GLOBAL_TAGS
+            print(specs)
+
         schemas = settings.get_schemas()
         if schemas:
             specs.update(
@@ -156,6 +160,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 paths[api[0]]["requestBody"] = self.__get_request_body(api[1])
 
             paths[api[0]]["responses"] = self.__get_responses(api[1])
+
+            if api[1].tags:
+                paths[api[0]]["tags"] = self.__get_tags(api[1])
+
         return paths
 
     def __detect_content_from_type(self, val) -> (str, bool, str):
@@ -185,6 +193,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 param_data.update(self.__get_type(param))
                 params.append(param_data)
         return params
+
+    def __get_tags(self, path_spec):
+        all_tags = sorted(path_spec.tags.values(), key=lambda x: x.order)
+        tag_list = []
+        for tag in all_tags:
+            if tag:
+                tag_list.append(tag.name)
+        return tag_list
 
     def __get_request_body(self, path_spec):
         contents = {}
@@ -270,7 +286,14 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     @staticmethod
     def find_api():
-        """Gets the API specs"""
+        """Gets the API specs
+        
+        Returns:
+            path, route_spec, opertiations:  Tuple 
+                path -- the API endpoint URL
+                route_spec -- the Tornado Request Handler class
+                operations -- list of tuples containing (method name, PathSpec object) 
+        """
         for route_spec in settings.api_routes():
             url, _ = _find_groups(route_spec[0])
             path = url
