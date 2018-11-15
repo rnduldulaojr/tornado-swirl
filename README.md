@@ -11,10 +11,12 @@ The main idea for this project is to automatically extract API specs from the us
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
 ## Current Release:
+* V. 0.1.9 -- Lowered Python version requirement to 3.6
 * v. 0.1.8 -- Support `tags` OpenAPI property.  
 * v. 0.1.7 -- Fixed bug where multiple host value (comma delimited) appears on ```servers``` value.  Also modified ```swirl.describe``` behavior.
 * v. 0.1.5 -- Fixed bug where ```application/json``` response has no ```schema``` attribute.
 * v. 0.1.2 -- Fixed openapi package inclusion
+
 
 [Tutorial and More Details Here](./TUTORIAL.md)
 
@@ -268,6 +270,7 @@ We decided on (almost like) Google style module docs for the doc format since ep
 
 ## TODOS
 - Support of ```object``` type.  Current version does not support OpenAPI ```object``` type (directly).  One will need to declare model classes and mark them with the @schema decorator and reference them.
+- We are trying to lower the python version requirements.  Python2.7 support will require a significant recode because of how we generate the path spec data (we add a path_spec attribute to the instance method/handler which is allowed in Python3+ but not in Python 2.7).  There is a weird behavior in Python3.5 where in the parsing of the URL patterns returns an arbitrary pattern:  i.e. in some test runs, a URL pattern is detected as /test/{a}/{b} and sometimes it comes out as /test/{b}/{a}.  For now, only tests for Python 3.6 and Python 3.7 are passing (via tox).
 
 
 ## Comments

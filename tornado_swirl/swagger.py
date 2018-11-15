@@ -1,11 +1,12 @@
 """Swagger decorators"""
-import inspect
 
+import inspect
 import tornado.web
 
+import tornado_swirl.settings as settings
 from tornado_swirl import docparser
 from tornado_swirl.handlers import swagger_handlers
-import tornado_swirl.settings as settings
+
 
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
@@ -26,7 +27,7 @@ def restapi(url, **kwargs):
                 continue
             path_spec = docparser.parse_from_docstring(str(doc))
             if path_spec:
-                setattr(member, 'path_spec', path_spec)
+                setattr(member, 'path_spec', path_spec) 
                 cls.tagged_api_comps.append(name)
         settings.add_api_handler(cls)
         settings.add_route(url, cls, **kwargs)
