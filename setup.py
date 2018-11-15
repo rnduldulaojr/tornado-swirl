@@ -30,8 +30,7 @@ setup(name='tornado-swirl',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.6'
       ],
       keywords=['SWAGGER', 'OPENAPI', 'TORNADO'],
       download_url='https://github.com/rduldulao/tornado-swirl/archive/v_0.1.9.tar.gz',
