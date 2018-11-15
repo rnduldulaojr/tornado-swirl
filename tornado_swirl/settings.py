@@ -32,7 +32,7 @@ class SwirlVars(object):
     API_HANDLERS = []
     GLOBAL_TAGS = []
 
-def get_api_handlers() -> list:
+def get_api_handlers():
     """Returns REST API handlers"""
     return SwirlVars.API_HANDLERS
 
@@ -58,7 +58,7 @@ def api_routes():
     """Return all registered REST API routes via @restapi decorator"""
     return SwirlVars.ROUTES
 
-def get_schemas() -> dict:
+def get_schemas():
     """Return all registered REST API models via @schema decorator"""
     return SwirlVars.SCHEMAS
 

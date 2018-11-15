@@ -29,7 +29,7 @@ class Type(object):
         self.kwargs = kwargs
 
     @staticmethod
-    def _determine_type(val: str, **kwargs):
+    def _determine_type(val, **kwargs):
         if val == "" or val is None:
             return NoneType()
         if val.startswith("[") and val.endswith("]"):
@@ -49,7 +49,7 @@ class Type(object):
         return Type._get_builtin_type(val, **kwargs)
 
     @staticmethod
-    def _get_builtin_type(val: str, **kwargs):
+    def _get_builtin_type(val, **kwargs):
         dtype = val
         dformat = None
         colon = val.find(':')

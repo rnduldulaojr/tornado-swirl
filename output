@@ -1,0 +1,1512 @@
+GLOB sdist-make: /home/rodolfoduldulao/workspace/python/tornado-swirl/setup.py
+py27-tornado51 inst-nodeps: /home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/.tmp/package/1/tornado-swirl-0.1.8.zip
+py27-tornado51 installed: atomicwrites==1.2.1,attrs==18.2.0,backports-abc==0.5,funcsigs==1.0.2,futures==3.2.0,more-itertools==4.3.0,pathlib2==2.3.2,pluggy==0.8.0,py==1.7.0,pytest==3.10.1,scandir==1.9.0,singledispatch==3.4.0.3,six==1.11.0,tornado==5.1.1,tornado-swirl==0.1.8
+py27-tornado51 run-test-pre: PYTHONHASHSEED='1493245315'
+py27-tornado51 runtests: commands[0] | pytest
+============================= test session starts ==============================
+platform linux2 -- Python 2.7.9, pytest-3.10.1, py-1.7.0, pluggy-0.8.0
+rootdir: /home/rodolfoduldulao/workspace/python/tornado-swirl, inifile:
+collected 34 items
+
+tests/test_docparser.py FFFFFFFFFFFFFFFF                                 [ 47%]
+tests/test_openapi_types.py ......                                       [ 64%]
+tests/test_swirl.py FFFFFFFFFFFF                                         [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_simple_parse_1 ______________________________
+
+    def test_simple_parse_1():
+        docstring = """This is the simple description"""
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description', spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________________ test_simple_parse_2 ______________________________
+
+    def test_simple_parse_2():
+        docstring = """This is the simple description.
+    
+        Long description.
+        """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\n\n    Long description.\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________________ test_simple_parse_3 ______________________________
+
+    def test_simple_parse_3():
+        docstring = """This is the simple description.
+        With a second line.
+    
+        Long description.
+        With a second line.
+        """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\n    With a second line.\n\n    Long description.\n    With a second line.\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________ test_simple_parse_4_with_path_params _____________________
+
+    def test_simple_parse_4_with_path_params():
+        docstring = """This is the simple description.
+    With a second line.
+    
+    Long description.
+    With a second line.
+    
+    Path Parameters:
+        employee_uid (int) -- The employee ID.
+    """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\nWith a second line.\n\nLong description.\nWith a second line.\n\nPath Parameters:\n    employee_uid (int) -- The employee ID.\n'
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+____________________ test_simple_parse_5_with_query_params _____________________
+
+    def test_simple_parse_5_with_query_params():
+        docstring = """This is the simple description.
+    With a second line.
+    
+    Long description.
+    With a second line.
+    
+    Query Parameters:
+        param1 (int) -- The param 1.
+        param2 (Model) -- Required. The param 2.
+    """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\nWith a second line.\n\nLong description.\nWith a second line.\n\nQuery Parameters:\n    param1 (int) -- The param 1.\n    param2 (Model) -- Required. The param 2.\n'
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________ test_simple_parse_6_with_body_params _____________________
+
+    def test_simple_parse_6_with_body_params():
+        docstring = """This is the simple description.
+    With a second line.
+    
+    Long description.
+    With a second line.
+    
+    Query Parameters:
+        param1 (int) -- The param 1.
+        param2 (Model) -- Required. The param 2.
+    
+    Request Body:
+        test (Model) -- Required.  This is the bomb.
+    """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\nWith a second line.\n\nLong description.\nWith a second line.\n\nQuery Parameters:\n... 1.\n    param2 (Model) -- Required. The param 2.\n\nRequest Body:\n    test (Model) -- Required.  This is the bomb.\n'
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_______________ test_simple_parse_6_with_body_params_and_headers _______________
+
+    def test_simple_parse_6_with_body_params_and_headers():
+        docstring = """This is the simple description.
+    With a second line.
+    
+    Long description.
+    With a second line.
+    
+    Headers:
+        Authorization -- Required. the login.
+    
+    Query Parameters:
+        param1 (int) -- The param 1.
+        param2 (Model) -- Required. The param 2.
+    
+    Request Body:
+        test (Model) -- Required.  This is the bomb.
+    """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\nWith a second line.\n\nLong description.\nWith a second line.\n\nHeaders:\n    Autho... 1.\n    param2 (Model) -- Required. The param 2.\n\nRequest Body:\n    test (Model) -- Required.  This is the bomb.\n'
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+________ test_simple_parse_6_with_body_params_and_headers_array_of_ints ________
+
+    def test_simple_parse_6_with_body_params_and_headers_array_of_ints():
+        docstring = """This is the simple description.
+    With a second line.
+    
+    Long description.
+    With a second line.
+    
+    Headers:
+        Authorization -- Required. the login.
+    
+    Query Parameters:
+        param1 ([int]) -- The param 1.
+        param2 (Model) -- Required. The param 2.
+    
+    Request Body:
+        test (Model) -- Required.  This is the bomb.
+    """
+    
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'This is the simple description.\nWith a second line.\n\nLong description.\nWith a second line.\n\nHeaders:\n    Autho... 1.\n    param2 (Model) -- Required. The param 2.\n\nRequest Body:\n    test (Model) -- Required.  This is the bomb.\n'
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________________ test_cookie_section ______________________________
+
+    def test_cookie_section():
+        docstring = """Cookie Monster
+    
+        Cookie:
+            x (string) -- required.  Cookie monster raaa
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Cookie Monster\n\n    Cookie:\n        x (string) -- required.  Cookie monster raaa\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+______________________________ test_response_200 _______________________________
+
+    def test_response_200():
+        docstring = """Response 200
+    
+        Response:
+            x (Model) -- Response 200
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Response 200\n\n    Response:\n        x (Model) -- Response 200\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+______________________ test_response_200_alternate_format ______________________
+
+    def test_response_200_alternate_format():
+        docstring = """Response 200
+    
+        200 Response:
+            x (Model) -- Response 200
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:263: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Response 200\n\n    200 Response:\n        x (Model) -- Response 200\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+______________________________ test_response_201 _______________________________
+
+    def test_response_201():
+        docstring = """Response 200
+    
+        201 Response:
+            None  -- ACCEPTED
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Response 200\n\n    201 Response:\n        None  -- ACCEPTED\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________________ test_error_responses _____________________________
+
+    def test_error_responses():
+        docstring = """Response 200
+    
+        Error Responses:
+            400 -- {Not A Good Request}
+            500 -- Hello
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Response 200\n\n    Error Responses:\n        400 -- {Not A Good Request}\n        500 -- Hello\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________________ test_docstring_test ______________________________
+
+    def test_docstring_test():
+        docstring = """Test get
+    
+            Hiho
+    
+            Cookie:
+                x (string) -- some foo
+    
+            Path Params:
+                emp_uid (int) -- test
+                date (date) -- test
+    
+            200 Response:
+                test (string) -- Test data
+    
+            Error Response:
+                400  -- Fudge
+            """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Test get\n\n        Hiho\n\n        Cookie:\n            x (string) -- some foo\n\n        Path Params:\n            ...ponse:\n            test (string) -- Test data\n        \n        Error Response:\n            400  -- Fudge\n        '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+____________________________ test_schema_properties ____________________________
+
+    def test_schema_properties():
+        docstring = """Test schema
+    
+        This is something
+    
+        Properties:
+            name (string) -- required.  The name.
+            age (int) -- The age.
+    
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Test schema\n\n    This is something\n\n    Properties:\n        name (string) -- required.  The name.\n        age (int) -- The age.\n\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_______________________________ test_param_props _______________________________
+
+    def test_param_props():
+        docstring = """Test schema
+    
+        This is something
+    
+        Properties:
+            name (string) -- required.  The name.
+            age (int) -- The age.
+                minimum: 1
+                maximum: 200
+    
+    
+        """
+>       path_spec = parse_from_docstring(docstring)
+
+tests/test_docparser.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+docstring = 'Test schema\n\n    This is something\n\n    Properties:\n        name (string) -- required.  The name.\n        age (int) -- The age.\n            minimum: 1\n            maximum: 200\n\n\n    '
+spec = 'operation'
+
+    def parse_from_docstring(docstring, spec='operation'):
+        """Returns path spec from docstring"""
+        # preprocess lines
+>       lines = docstring.splitlines(keepends=True)
+E       TypeError: splitlines() takes no keyword arguments
+
+tornado_swirl/docparser.py:407: TypeError
+_____________________ TestSampleEndpoints.test_describe_1 ______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_describe_1>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______________ TestSampleEndpoints.test_describe_2_default_server ______________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_describe_2_default_server>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+_______________ TestSampleEndpoints.test_request_body_file_data ________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_file_data>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+_______________ TestSampleEndpoints.test_request_body_form_data ________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_form_data>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+_________________ TestSampleEndpoints.test_request_body_model __________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_model>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______________________ TestSampleEndpoints.test_simple_1 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_1>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______________________ TestSampleEndpoints.test_simple_2 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_2>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______________________ TestSampleEndpoints.test_simple_3 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_3>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+_________________ TestSampleEndpoints.test_simple_descriptions _________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_descriptions>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______ TestSampleEndpoints.test_simple_parse_with_multipart_request_body _______
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_parse_with_multipart_request_body>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______ TestSampleEndpoints.test_simple_parse_with_urlencoded_request_body ______
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_parse_with_urlencoded_request_body>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+______________________ TestSampleEndpoints.test_spec_html ______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_spec_html>
+
+    def setUp(self):
+>       super().setUp()
+E       TypeError: super() takes at least 1 argument (0 given)
+
+tests/test_swirl.py:13: TypeError
+===================== 28 failed, 6 passed in 0.34 seconds ======================
+ERROR: InvocationError for command '/home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/py27-tornado51/bin/pytest' (exited with code 1)
+py35-tornado51 inst-nodeps: /home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/.tmp/package/1/tornado-swirl-0.1.8.zip
+py35-tornado51 installed: atomicwrites==1.2.1,attrs==18.2.0,more-itertools==4.3.0,pathlib2==2.3.2,pluggy==0.8.0,py==1.7.0,pytest==3.10.1,six==1.11.0,tornado==5.1.1,tornado-swirl==0.1.8
+py35-tornado51 run-test-pre: PYTHONHASHSEED='1493245315'
+py35-tornado51 runtests: commands[0] | pytest
+============================= test session starts ==============================
+platform linux -- Python 3.5.6, pytest-3.10.1, py-1.7.0, pluggy-0.8.0
+rootdir: /home/rodolfoduldulao/workspace/python/tornado-swirl, inifile:
+collected 34 items
+
+tests/test_docparser.py ................                                 [ 47%]
+tests/test_openapi_types.py ......                                       [ 64%]
+tests/test_swirl.py FFFFFFFFFFF.                                         [100%]
+
+=================================== FAILURES ===================================
+_____________________ TestSampleEndpoints.test_describe_1 ______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_describe_1>
+
+    @gen_test
+    def test_describe_1(self):
+        self.reset_settings()
+        swirl.describe(title='title', description='description', servers=[
+            {'url': 'http://test/', 'description': 'test', 'foo': 'foo'}
+        ])
+    
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+    
+            def post():
+                """This is the simple description.
+                With a second line.
+    
+                Long description.
+                With a second line.
+    
+                Request Body:
+                    file (file:image/png) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+    
+        self._app.add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:352: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test": {"post": {"summary"..., "name": {"type": "string"}}}}}}}}}, "openapi": "3.0.0", "servers": [{"description": "test", "url": "http://test/"}]}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______________ TestSampleEndpoints.test_describe_2_default_server ______________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_describe_2_default_server>
+
+    @gen_test
+    def test_describe_2_default_server(self):
+        # reset default_settings
+        self.reset_settings()
+        swirl.describe(title='title', description='description')
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+    
+            def post():
+                """This is the simple description.
+                With a second line.
+    
+                Long description.
+                With a second line.
+    
+                Request Body:
+                    file (file:image/png) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+    
+        self._app.add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test": {"post": {"summary"...tring"}}}}}}}}}, "openapi": "3.0.0", "servers": [{"description": "Default server", "url": "http://127.0.0.1:38409/"}]}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+_______________ TestSampleEndpoints.test_request_body_file_data ________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_file_data>
+
+    @gen_test
+    def test_request_body_file_data(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            def post(self, a, b):
+                """This is a simple test post with form data.
+    
+                This is a simple description.
+    
+                Request Body:
+                    file (file:text/csv) -- The file.
+    
+    
+                Returns:
+                    out (string) -- An output.
+    
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...tring"}}}}}}}}}, "openapi": "3.0.0", "servers": [{"description": "Default server", "url": "http://127.0.0.1:37663/"}]}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+_______________ TestSampleEndpoints.test_request_body_form_data ________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_form_data>
+
+    @gen_test
+    def test_request_body_form_data(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            def post(self, a, b):
+                """This is a simple test post with form data.
+    
+                This is a simple description.
+    
+                Request Body:
+                    a (string) -- The a.
+                    b (integer) -- The b
+    
+                Response:
+                    out (string) -- An output.
+    
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...tring"}}}}}}}}}, "openapi": "3.0.0", "servers": [{"description": "Default server", "url": "http://127.0.0.1:44243/"}]}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+_________________ TestSampleEndpoints.test_request_body_model __________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_request_body_model>
+
+    @gen_test
+    def test_request_body_model(self):
+        @swirl.restapi(r'/test/form')
+        class HandlerTest(RequestHandler):
+            def post(self, a, b):
+                """This is a simple test post with form data.
+    
+                This is a simple description.
+    
+                Request Body:
+                    user (Model) -- Model model.
+    
+    
+                Response:
+                    out (string) -- An output.
+    
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+    
+        @swirl.schema
+        class Model(object):
+            """This is a sample model.
+    
+            Foo Bar description.
+    
+            Properties:
+                name (string): Foo name
+                type (enum[foo, bar]) : Foo type
+            """
+            pass
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:39743/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______________________ TestSampleEndpoints.test_simple_1 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_1>
+
+    @gen_test
+    def test_simple_1(self):
+    
+        @swirl.restapi('/test')
+        class HandlerTest(RequestHandler):
+            def get(self):
+                """This is a simple test get.
+    
+                This is a simple description.
+    
+                Query Parameters:
+                    foo (string) -- Optional. Simple query string.
+    
+                Response:
+                    out (string) -- An output.
+                """
+                self.finish()
+    
+        self._app.add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:41261/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______________________ TestSampleEndpoints.test_simple_2 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_2>
+
+    @gen_test
+    def test_simple_2(self):
+    
+        @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
+        class HandlerTest(RequestHandler):
+            def post(self, a, b):
+                """This is a simple test get.
+    
+                This is a simple description.
+    
+                Path Parameters:
+                    a (string) -- The a.
+                    b (integer) -- The b
+    
+                Response:
+                    out (string) -- An output.
+    
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:34675/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______________________ TestSampleEndpoints.test_simple_3 _______________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_3>
+
+    @gen_test
+    def test_simple_3(self):
+    
+        @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
+        class HandlerTest(RequestHandler):
+            def post(self, a, b):
+                """This is a simple test get.
+    
+                This is a simple description.
+    
+                Path Parameters:
+                    a (string) -- The a.
+                    b (integer) -- The b
+    
+                Response:
+                    out (Model) -- An output.
+    
+                Errors:
+                    400 -- Bad Request
+                    404 -- Not Found
+                """
+                self.finish()
+    
+        @swirl.schema
+        class Model(object):
+            """This is a sample model.
+    
+            Foo Bar description.
+    
+            Properties:
+                name (string): Foo name
+                type (enum[foo, bar]) : Foo type
+            """
+            pass
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:38399/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+_________________ TestSampleEndpoints.test_simple_descriptions _________________
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_descriptions>
+
+    @gen_test
+    def test_simple_descriptions(self):
+    
+        @swirl.restapi('/test')
+        class HandlerTest(RequestHandler):
+            def get(self):
+                """This is a simple test get.
+    
+                This is a simple description.
+    
+                Query Parameters:
+                    foo (string) -- Optional. Simple query string.
+                        example: bar
+    
+                Response:
+                    out (string) -- An output.
+                        example: foo
+                """
+                self.finish()
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:43281/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______ TestSampleEndpoints.test_simple_parse_with_multipart_request_body _______
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_parse_with_multipart_request_body>
+
+    @gen_test
+    def test_simple_parse_with_multipart_request_body(self):
+    
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+    
+            def post():
+                """This is the simple description.
+                With a second line.
+    
+                Long description.
+                With a second line.
+    
+                Request Body:
+                    file (file:image/png) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:41859/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+______ TestSampleEndpoints.test_simple_parse_with_urlencoded_request_body ______
+
+self = <tests.test_swirl.TestSampleEndpoints testMethod=test_simple_parse_with_urlencoded_request_body>
+
+    @gen_test
+    def test_simple_parse_with_urlencoded_request_body(self):
+    
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+    
+            def post():
+                """This is the simple description.
+                With a second line.
+    
+                Long description.
+                With a second line.
+    
+                Request Body:
+                    foo  (string) -- Required.  Image file.
+                    name (string) -- Required.  Name.
+            """
+            pass
+    
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+>       obj = json.loads(response.body)
+
+tests/test_swirl.py:429: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+s = b'{"info": {"description": "description", "version": "v1.0", "title": "title"}, "paths": {"/test/form": {"post": {"sum...rver", "url": "http://127.0.0.1:45841/"}], "components": {"schemas": {"Model": {"type": "object", "properties": {}}}}}'
+encoding = None, cls = None, object_hook = None, parse_float = None
+parse_int = None, parse_constant = None, object_pairs_hook = None, kw = {}
+
+    def loads(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+            parse_int=None, parse_constant=None, object_pairs_hook=None, **kw):
+        """Deserialize ``s`` (a ``str`` instance containing a JSON
+        document) to a Python object.
+    
+        ``object_hook`` is an optional function that will be called with the
+        result of any object literal decode (a ``dict``). The return value of
+        ``object_hook`` will be used instead of the ``dict``. This feature
+        can be used to implement custom decoders (e.g. JSON-RPC class hinting).
+    
+        ``object_pairs_hook`` is an optional function that will be called with the
+        result of any object literal decoded with an ordered list of pairs.  The
+        return value of ``object_pairs_hook`` will be used instead of the ``dict``.
+        This feature can be used to implement custom decoders that rely on the
+        order that the key and value pairs are decoded (for example,
+        collections.OrderedDict will remember the order of insertion). If
+        ``object_hook`` is also defined, the ``object_pairs_hook`` takes priority.
+    
+        ``parse_float``, if specified, will be called with the string
+        of every JSON float to be decoded. By default this is equivalent to
+        float(num_str). This can be used to use another datatype or parser
+        for JSON floats (e.g. decimal.Decimal).
+    
+        ``parse_int``, if specified, will be called with the string
+        of every JSON int to be decoded. By default this is equivalent to
+        int(num_str). This can be used to use another datatype or parser
+        for JSON integers (e.g. float).
+    
+        ``parse_constant``, if specified, will be called with one of the
+        following strings: -Infinity, Infinity, NaN.
+        This can be used to raise an exception if invalid JSON numbers
+        are encountered.
+    
+        To use a custom ``JSONDecoder`` subclass, specify it with the ``cls``
+        kwarg; otherwise ``JSONDecoder`` is used.
+    
+        The ``encoding`` argument is ignored and deprecated.
+    
+        """
+        if not isinstance(s, str):
+            raise TypeError('the JSON object must be str, not {!r}'.format(
+>                               s.__class__.__name__))
+E           TypeError: the JSON object must be str, not 'bytes'
+
+../../../.pyenv/versions/3.5.6/lib/python3.5/json/__init__.py:312: TypeError
+===================== 11 failed, 23 passed in 0.32 seconds =====================
+ERROR: InvocationError for command '/home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/py35-tornado51/bin/pytest' (exited with code 1)
+py36-tornado51 inst-nodeps: /home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/.tmp/package/1/tornado-swirl-0.1.8.zip
+py36-tornado51 installed: atomicwrites==1.2.1,attrs==18.2.0,more-itertools==4.3.0,pluggy==0.8.0,py==1.7.0,pytest==3.10.1,six==1.11.0,tornado==5.1.1,tornado-swirl==0.1.8
+py36-tornado51 run-test-pre: PYTHONHASHSEED='1493245315'
+py36-tornado51 runtests: commands[0] | pytest
+============================= test session starts ==============================
+platform linux -- Python 3.6.6, pytest-3.10.1, py-1.7.0, pluggy-0.8.0
+rootdir: /home/rodolfoduldulao/workspace/python/tornado-swirl, inifile:
+collected 34 items
+
+tests/test_docparser.py ................                                 [ 47%]
+tests/test_openapi_types.py ......                                       [ 64%]
+tests/test_swirl.py ............                                         [100%]
+
+========================== 34 passed in 0.19 seconds ===========================
+py37-tornado51 recreate: /home/rodolfoduldulao/workspace/python/tornado-swirl/.tox/py37-tornado51
+ERROR: Error creating virtualenv. Note that some special characters (e.g. ':' and unicode symbols) in paths are not supported by virtualenv. Error details: InvocationError("Failed to get version_info for python3.7: pyenv: python3.7: command not found\n\nThe `python3.7' command exists in these Python versions:\n  3.7.0\n\n", None)
+___________________________________ summary ____________________________________
+ERROR:   py27-tornado51: commands failed
+ERROR:   py35-tornado51: commands failed
+  py36-tornado51: commands succeeded
+ERROR:   py37-tornado51: Error creating virtualenv. Note that some special characters (e.g. ':' and unicode symbols) in paths are not supported by virtualenv. Error details: InvocationError("Failed to get version_info for python3.7: pyenv: python3.7: command not found\n\nThe `python3.7' command exists in these Python versions:\n  3.7.0\n\n", None)

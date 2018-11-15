@@ -1,8 +1,10 @@
+# pylint: disable=W0611
 """Docstring line parser implementation.
 
 Returns:
     [type] -- [description]
 """
+
 
 import numbers
 import re
@@ -104,7 +106,7 @@ def _get_real_value(name, value):
     return dtype(value)
 
 
-def _get_description_props(description: str):
+def _get_description_props(description):
     """Returns description, kwargs"""
     kwargs = {}
 
@@ -172,7 +174,7 @@ def _process_tags(fsm_obj, **kwargs):
     _set_default_type(fsm_obj.spec.tags, Type("string"))
     fsm_obj.buffer = ""
 
-def _clean_lines(lines: []):
+def _clean_lines(lines):
     cleaned_lines, lines = [lines[0].strip()], lines[1:]
     while lines:
         cur_line, lines = lines[0], lines[1:]
@@ -192,7 +194,8 @@ _HEADERS = {
     _HEADER_HEADERS: (r"(http\s+)?(request\s+)?header(s)?:", _process_header),
     _ERROR_HEADERS: (r"(error(s|\s*response(s)?)?|default(\s*response(s)?)):",
                      _process_errors),
-    _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):", _process_response),
+    _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):",
+                        _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
     _TAGS_HEADERS:(r"tag(s?):", _process_tags)
 }
@@ -401,10 +404,10 @@ class _ParseFSM:
         callback(self)
 
 
-def parse_from_docstring(docstring: str, spec='operation'):
+def parse_from_docstring(docstring, spec='operation'):
     """Returns path spec from docstring"""
     # preprocess lines
-    lines = docstring.splitlines(keepends=True)
+    lines = docstring.splitlines(True)
     parser = _ParseFSM(FSM_MAP, lines, spec)
     parser.run()
     return parser.spec

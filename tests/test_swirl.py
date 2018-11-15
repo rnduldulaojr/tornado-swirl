@@ -10,7 +10,7 @@ import json
 class TestSampleEndpoints(AsyncHTTPTestCase):
 
     def setUp(self):
-        super().setUp()
+        super(TestSampleEndpoints, self).setUp()
         settings._API_HANDLERS = []
         settings._SCHEMAS = {}
         settings._ROUTES = []
@@ -38,7 +38,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         @swirl.restapi('/test')
         class HandlerTest(RequestHandler):
-            async def get(self):
+            def get(self):
                 """This is a simple test get.
 
                 This is a simple description.
@@ -53,7 +53,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self._app.add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         assert obj['paths']
         assert obj['paths']['/test']
         assert obj['paths']['/test']['get']
@@ -70,7 +70,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
         class HandlerTest(RequestHandler):
-            async def post(self, a, b):
+            def post(self, a, b):
                 """This is a simple test get.
 
                 This is a simple description.
@@ -90,7 +90,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test/{a}/{b}']
@@ -105,7 +105,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
         class HandlerTest(RequestHandler):
-            async def post(self, a, b):
+            def post(self, a, b):
                 """This is a simple test get.
 
                 This is a simple description.
@@ -137,7 +137,8 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
+        print(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test/{a}/{b}']
@@ -154,7 +155,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
     def test_request_body_form_data(self):
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
-            async def post(self, a, b):
+            def post(self, a, b):
                 """This is a simple test post with form data.
 
                 This is a simple description.
@@ -174,7 +175,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']
@@ -186,7 +187,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
     def test_request_body_file_data(self):
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
-            async def post(self, a, b):
+            def post(self, a, b):
                 """This is a simple test post with form data.
 
                 This is a simple description.
@@ -206,7 +207,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test/form']
@@ -219,7 +220,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
     def test_request_body_model(self):
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
-            async def post(self, a, b):
+            def post(self, a, b):
                 """This is a simple test post with form data.
 
                 This is a simple description.
@@ -251,7 +252,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']
@@ -264,7 +265,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         @swirl.restapi('/test')
         class HandlerTest(RequestHandler):
-            async def get(self):
+            def get(self):
                 """This is a simple test get.
 
                 This is a simple description.
@@ -281,7 +282,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         assert obj['paths']
         assert obj['paths']['/test']
         assert obj['paths']['/test']['get']
@@ -300,7 +301,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            async def post():
+            def post():
                 """This is the simple description.
                 With a second line.
 
@@ -315,7 +316,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test']
@@ -334,7 +335,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            async def post():
+            def post():
                 """This is the simple description.
                 With a second line.
 
@@ -349,7 +350,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self._app.add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         assert obj.get("openapi", None) == "3.0.0"
         assert obj["info"]
         assert obj["info"]["title"]
@@ -373,7 +374,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            async def post():
+            def post():
                 """This is the simple description.
                 With a second line.
 
@@ -388,7 +389,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self._app.add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
         print(obj)
         assert obj.get("openapi", None) == "3.0.0"
         assert obj["info"]
@@ -411,7 +412,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            async def post():
+            def post():
                 """This is the simple description.
                 With a second line.
 
@@ -426,7 +427,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
-        obj = json.loads(response.body)
+        obj = json.loads(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test']
@@ -441,7 +442,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            async def post():
+            def post():
                 """This is the simple description.
                 With a second line.
 

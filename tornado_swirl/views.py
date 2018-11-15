@@ -3,7 +3,12 @@
 import inspect
 import json
 import re
-from urllib.parse import urljoin
+
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
+
 
 import tornado.template
 import tornado.web
@@ -166,7 +171,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         return paths
 
-    def __detect_content_from_type(self, val) -> (str, bool, str):
+    def __detect_content_from_type(self, val): # -> (str, bool, str):
         if val.type.name == "file":
             return "file", False, val.type.contents
         if val.type.name in settings.get_schemas().keys():
@@ -322,7 +327,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             yield path, spec, operations
 
 
-def _find_groups(url: str):
+def _find_groups(url):
     """Returns a tuple (reverse string, group count) for a url.
 
     For example: Given the url pattern /([0-9]{4})/([a-z-]+)/, this method

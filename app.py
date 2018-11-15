@@ -121,18 +121,18 @@ add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
 #         """
 #         pass
 
-# @restapi('/withrequestbody5')
-# class FooHandler5(tornado.web.RequestHandler):
+@restapi('/withrequestbody5')
+class FooHandler5(tornado.web.RequestHandler):
 
-#     def get(self, itemid):
-#         """Get Item data.
+    def get(self, itemid):
+        """Get Item data.
 
-#         Gets Item data from database.
+        Gets Item data from database.
 
-#         Request Body:
-#             user (User) -- required. User data.
-#         """
-#         pass
+        Request Body:
+            user (User) -- required. User data.
+        """
+        pass
 
 # @schema
 # class User(object):
@@ -168,7 +168,7 @@ class MyHandler(tornado.web.RequestHandler):
             500 (ErrorResponse) -- Internal Server Error.
 
          Tags:
-            internal
+            internal api
         """
         self.finish()
 
