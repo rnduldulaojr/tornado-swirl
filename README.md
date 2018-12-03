@@ -11,6 +11,7 @@ The main idea for this project is to automatically extract API specs from the us
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
 ## Current Release:
+* V. 0.1.11 -- Fixed bug where descriptions are not being included in schema and schema properties.
 * V. 0.1.10 -- Lowered Python version requirement to 3.6, Added add_global_tag to tornado_swirl import.
 * v. 0.1.8 -- Support `tags` OpenAPI property.  
 * v. 0.1.7 -- Fixed bug where multiple host value (comma delimited) appears on ```servers``` value.  Also modified ```swirl.describe``` behavior.
@@ -241,12 +242,14 @@ Swagger spec will look something like:
         "schemas": {
             "User": {
                 "type": "object",
+                "description": "User def",
                 "required": [
                     "name"
                 ],
                 "properties": {
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "User name"
                     },
                     "age": {
                         "type": "integer",
