@@ -24,7 +24,7 @@ _TAGS_HEADERS = 'tags'
 
 #data processors
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>\w+( +\w+)*)(\s+\((?P<type>[\w, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)
@@ -68,6 +68,7 @@ def _lookup_type_of(name):
 def _process_params(fsm_obj, ptype, required_func=None):
     # get buffer and conver
     # first merge lines without -- to previous lines
+    print("Detecting: ", ptype)
     if required_func is None:
         required_func = lambda x, y: x == y
 
