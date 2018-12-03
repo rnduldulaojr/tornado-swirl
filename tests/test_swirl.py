@@ -138,7 +138,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body.decode('utf-8'))
-        print(response.body.decode('utf-8'))
+        # print(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test/{a}/{b}']
@@ -390,7 +390,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self._app.add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body.decode('utf-8'))
-        print(obj)
+        # print(obj)
         assert obj.get("openapi", None) == "3.0.0"
         assert obj["info"]
         assert obj["info"]["title"]
@@ -458,4 +458,46 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec.html'))
         assert response.code == 200
+
+    @gen_test
+    def test_schema_spec_descriptions(self):
+
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+        @swirl.schema
+        class User:
+            """Sample Schema
+            
+            
+            Properties:
+                name (string) -- This should be the description.
+            """
+
+            pass
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['components']
+        assert obj['components']['schemas']
+        assert obj['components']['schemas']['User']
+        assert obj['components']['schemas']['User']['properties']
+        assert obj['components']['schemas']['User']['properties']['name']
+        assert obj['components']['schemas']['User']['properties']['name']['description']
+        assert obj['components']['schemas']['User']['properties']['name']['description'] == 'This should be the description.'
+       
 

@@ -134,18 +134,18 @@ class FooHandler5(tornado.web.RequestHandler):
         """
         pass
 
-# @schema
-# class User(object):
-#     """User
+@schema
+class User(object):
+    """User
 
-#     User def
+    User def
 
-#     Properties:
-#         name (string) -- required. The name
-#         age (int) -- The age.
-#             minimum: 1  maximum: 100
-#     """
-#     pass
+    Properties:
+        name (string) -- required. The name
+        age (int) -- The age.
+            minimum: 1  maximum: 100
+    """
+    pass
 
 @restapi('/path/to/api')
 class MyHandler(tornado.web.RequestHandler):

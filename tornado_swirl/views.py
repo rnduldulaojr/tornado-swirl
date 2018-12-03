@@ -110,7 +110,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         if settings.SwirlVars.GLOBAL_TAGS:
             specs['tags'] = settings.SwirlVars.GLOBAL_TAGS
-            print(specs)
+            # print(specs)
 
         schemas = settings.get_schemas()
         if schemas:
@@ -131,9 +131,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         spec = cls.schema_spec
         props = [(prop.name, self._prop_to_dict(prop), prop.required)
                  for (_, prop) in spec.properties.items()]
+
         required = [name for name, _, req in props if req]
 
         val = {"type": "object"}
+        val['description'] =  spec.description or spec.summary
         if required:
             val.update({"required": required})
 
@@ -149,6 +151,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         schema = self.__get_type(prop)['schema']
         if schema is not None:
             schema.update(prop.kwargs)
+        if prop.description:
+            schema.update({"description": prop.description})
         return schema
 
     def __get_api_spec(self, spec, operations):
