@@ -68,7 +68,7 @@ def _lookup_type_of(name):
 def _process_params(fsm_obj, ptype, required_func=None):
     # get buffer and conver
     # first merge lines without -- to previous lines
-    print("Detecting: ", ptype)
+    # print("Detecting: ", ptype)
     if required_func is None:
         required_func = lambda x, y: x == y
 
