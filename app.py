@@ -129,6 +129,10 @@ class FooHandler5(tornado.web.RequestHandler):
 
         Gets Item data from database.
 
+        HTTP Headers: 
+            Tt-I2ap-Id -- Uri.
+            Tt-I2ap-Sec -- Some Hex token
+
         Request Body:
             user (User) -- required. User data.
         """
@@ -141,6 +145,8 @@ class User(object):
     User def
 
     Properties:
+        underscore_test -- Test
+        m9_9 -- Test
         name (string) -- required. The name
         age (int) -- The age.
             minimum: 1  maximum: 100
