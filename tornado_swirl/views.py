@@ -135,6 +135,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         required = [name for name, _, req in props if req]
 
         val = {"type": "object"}
+        val['description'] =  spec.description or spec.summary
         if required:
             val.update({"required": required})
 
