@@ -40,6 +40,7 @@ def schema(cls):
     name = cls.__name__
     doc = inspect.getdoc(cls)
     model_spec = docparser.parse_from_docstring(doc, spec='schema')
+    # print(model_spec)
     if model_spec:
         cls.schema_spec = model_spec
         settings.add_schema(name, cls)
