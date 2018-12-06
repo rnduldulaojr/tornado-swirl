@@ -487,6 +487,23 @@ class SomeUserClass(object):
 
 The docstring format should be the same as the REST API paths, although only ```Properties:``` or ```Property:``` section header is recognized here.
 
+
+## Deprecated APIs/Schemas
+
+To mark an API as deprecated, add ```Deprecated``` or ```[Deprecated]``` to your python docs in a line of its own.   It can be all caps.
+
+```python
+@swirl.restapi('/path/to/api')
+class MyHandler(tornado.web.RequestHandler):
+    async def get():
+        """This will be the API path summary.
+
+        DEPRECATED
+
+        ...
+        """
+```
+
 ## Getting The Routes
 
 You will need to use the swirl Tornado Application wrapper class and get the API routes registered via ```@restapi``` decorator using the ```api_routes()``` function.
