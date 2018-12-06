@@ -27,7 +27,6 @@ def json_dumps(obj, pretty=False):
                       separators=(',', ': ')) \
                       if pretty else json.dumps(obj)
 
-
 class SwaggerUIHandler(tornado.web.RequestHandler):
     """Serves the Swagger UI"""
     def initialize(self, static_path, **kwds):
@@ -40,29 +39,6 @@ class SwaggerUIHandler(tornado.web.RequestHandler):
         discovery_url = urljoin(
             self.request.full_url(), self.reverse_url(settings.URL_SWAGGER_API_SPEC))
         self.render('index.html', discovery_url=discovery_url)
-
-# class SwaggerResourcesHandler(tornado.web.RequestHandler):
-#     def initialize(self, api_version, exclude_namespaces, **kwds):
-#         self.api_version = api_version
-#         self.exclude_namespaces = exclude_namespaces
-
-#     def get(self):
-#         self.set_header('content-type', 'application/json')
-#         u = urlparse(self.request.full_url())
-#         resources = {
-#             'apiVersion': self.api_version,
-#             'openapi': SWAGGER_VERSION,
-#             'basePath': '%s://%s' % (u.scheme, u.netloc),
-#             'produces': ["application/json"],
-#             'description': 'Test Api Spec',
-#             'apis': [{
-#                 'path': self.reverse_url(URL_SWAGGER_API_SPEC),
-#                 'description': 'Test Api Spec'
-#             }]
-#         }
-
-#         self.finish(json_dumps(resources, self.get_arguments('pretty')))
-
 
 class SwaggerApiHandler(tornado.web.RequestHandler):
     """Openapi 3.0 spec generator class handler"""
@@ -110,7 +86,6 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         if settings.SwirlVars.GLOBAL_TAGS:
             specs['tags'] = settings.SwirlVars.GLOBAL_TAGS
-            # print(specs)
 
         schemas = settings.get_schemas()
         if schemas:
@@ -135,7 +110,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         required = [name for name, _, req in props if req]
 
         val = {"type": "object"}
-        val['description'] =  spec.description or spec.summary
+        val['description'] = spec.description or spec.summary
         if required:
             val.update({"required": required})
 
@@ -164,7 +139,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 'description': api[1].description.strip(),
                 'parameters': self.__get_params(api[1]),
             }
-            #print("Body Params: ", api[1].body_params)
+            if api[1].deprecated:
+                paths[api[0]]['deprecated'] = True
+
             if api[1].body_params:
                 paths[api[0]]["requestBody"] = self.__get_request_body(api[1])
 

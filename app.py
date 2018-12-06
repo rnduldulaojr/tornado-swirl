@@ -129,6 +129,8 @@ class FooHandler5(tornado.web.RequestHandler):
 
         Gets Item data from database.
 
+        Deprecated
+        
         HTTP Headers: 
             Tt-I2ap-Id -- Uri.
             Tt-I2ap-Sec -- Some Hex token

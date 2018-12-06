@@ -21,6 +21,7 @@ _ERROR_HEADERS = 'errors'
 _RESPONSE_HEADERS = 'responses'
 _PROPERTY_HEADERS = 'properties'
 _TAGS_HEADERS = 'tags'
+_DEPRECATED_HEADERS = 'deprecated'
 
 #data processors
 # objects
@@ -68,7 +69,6 @@ def _lookup_type_of(name):
 def _process_params(fsm_obj, ptype, required_func=None):
     # get buffer and conver
     # first merge lines without -- to previous lines
-    # print("Detecting: ", ptype)
     if required_func is None:
         required_func = lambda x, y: x == y
 
@@ -175,6 +175,10 @@ def _process_tags(fsm_obj, **kwargs):
     _set_default_type(fsm_obj.spec.tags, Type("string"))
     fsm_obj.buffer = ""
 
+def _process_deprecated(fsm_obj, **kwargs):
+    fsm_obj.spec.deprecated = True
+    fsm_obj.buffer = ""
+
 def _clean_lines(lines):
     cleaned_lines, lines = [lines[0].strip()], lines[1:]
     while lines:
@@ -198,7 +202,8 @@ _HEADERS = {
     _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):",
                         _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
-    _TAGS_HEADERS:(r"tag(s?):", _process_tags)
+    _TAGS_HEADERS:(r"tag(s?):", _process_tags),
+    _DEPRECATED_HEADERS: (r"(deprecated|\[deprecated\])", _process_deprecated)
 }
 
 _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
@@ -206,7 +211,7 @@ _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
 _ALL_HEADERS = '|'.join([rs for (rs, _) in _HEADERS.values()])
 _ALL_HEADERS_REGEX = re.compile("^("+_ALL_HEADERS+")$", re.IGNORECASE)
 _SECTION_HEADER_REGEX = re.compile(r"^([\w ]+):$")
-
+_DEPRECATED_HEADER_REGEX = re.compile(r"^(deprecated|\[deprecated\])$", re.IGNORECASE)
 
 S_START = 0
 S_SUMMARY = 1
@@ -220,7 +225,6 @@ S_SECTION = 5
 
 def _get_header_type(section_header):
     # returns header type and some info
-    # print(section_header)
     for (name, (regex, _)) in _HEADERS_REGEX.items():
         matcher = regex.match(str(section_header))
         if matcher:
@@ -243,10 +247,8 @@ def _transition_section(fsm_obj):
 
 
 def _transition_processbuffer(fsm_obj):
-    #print("Processing buffer")
     # get cur header type
     htype, params = _get_header_type(fsm_obj.cur_header)
-    #print("Header type: ", htype)
     _, processor = _HEADERS_REGEX.get(htype, (None, None))
 
     # process the buffer
@@ -280,31 +282,26 @@ def _is_generic_line(line):
     line = line.strip()
     if _SECTION_HEADER_REGEX.match(line):
         return False
+    if _DEPRECATED_HEADER_REGEX.match(line):
+        return False
     if line == "":
         return False
     if _is_end(line):
         return False
-
-    #print("Detected generic line")
     return True
-
 
 def _is_end(line):
     return line.strip() == "--THE END--"
 
-
 def _is_blank_line(line):
-    #print("Detected blank" if line.strip == "" else "")
     return line.strip() == ""
-
 
 def _is_generic_line_or_blank(line):
     return _is_generic_line(line) or _is_blank_line(line)
 
-
 def _is_section_header(line):
-    #print("Detected section header " + line if _SECTION_HEADER_REGEX.match(line.strip()) else "" )
-    return True if _SECTION_HEADER_REGEX.match(line.strip()) else False
+    stripped = line.strip()
+    return _SECTION_HEADER_REGEX.match(stripped) or _DEPRECATED_HEADER_REGEX.match(stripped)
 
 
 FSM_MAP = (
@@ -393,7 +390,6 @@ class _ParseFSM:
     def _iterate_re_evaluators(self, line, transition):
         condition = transition['condition']
         if condition(line):
-            #print("current ", self.current_state)
             self._update_state(
                 transition['dst'], transition['callback'])
             return True
@@ -401,7 +397,6 @@ class _ParseFSM:
 
     def _update_state(self, new_state, callback):
         self.current_state = new_state
-        #print("new state ", self.current_state)
         callback(self)
 
 

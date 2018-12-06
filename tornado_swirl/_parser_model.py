@@ -16,6 +16,7 @@ class PathSpec(object):
         self.responses = {}
         self.properties = {}
         self.tags = {}
+        self.deprecated = False
 
 
 class SchemaSpec(object):
@@ -25,6 +26,7 @@ class SchemaSpec(object):
         self.name = ""
         self.summary = ""
         self.description = ""
+        self.deprecated = False
         self.properties = {}
 
 

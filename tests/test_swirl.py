@@ -16,7 +16,6 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         settings._ROUTES = []
 
     def get_app(self):
-        #print("Returning new app")
         return swirl.Application()
 
     def reset_settings(self):
@@ -138,7 +137,6 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body.decode('utf-8'))
-        # print(response.body.decode('utf-8'))
 
         assert obj['paths']
         assert obj['paths']['/test/{a}/{b}']
@@ -390,7 +388,6 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self._app.add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body.decode('utf-8'))
-        # print(obj)
         assert obj.get("openapi", None) == "3.0.0"
         assert obj["info"]
         assert obj["info"]["title"]
@@ -501,3 +498,64 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['components']['schemas']['User']['properties']['name']['description'] == 'This should be the description.'
        
 
+    @gen_test
+    def test_deprecated(self):
+
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                DEPRECATED
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+       
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['deprecated']
+
+    @gen_test
+    def test_deprecated2(self):
+
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def post():
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                [DEPRECATED]
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+       
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['deprecated']

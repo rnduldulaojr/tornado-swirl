@@ -26,8 +26,6 @@ def swagger_handlers():
     return [
         URLSpec(prefix + r'spec.html$', SwaggerUIHandler,
                 settings.default_settings, name=settings.URL_SWAGGER_API_DOCS),
-        # URLSpec(prefix + r'spec.json$', SwaggerResourcesHandler,
-        #         default_settings, name=URL_SWAGGER_API_LIST),
         URLSpec(prefix + r'spec$', SwaggerApiHandler,
                 name=settings.URL_SWAGGER_API_SPEC),
         (prefix + r'(.*\.(css|png|gif|js))', StaticFileHandler,
