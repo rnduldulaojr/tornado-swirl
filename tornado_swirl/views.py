@@ -298,9 +298,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                     path_sp.path_params = path_param_spec
                 vals = path_param_spec.values()
                 sorted(vals, key=lambda x: x.order)
-                path = url % tuple(
-                    ['{%s}' % arg for arg in [param.name for param in vals]]
-                )
+                if len(vals) > 0:
+                    path = url % (
+                        ['{%s}' % arg for arg in [param.name for param in vals]][0]
+                    )
 
             else:
                 continue
