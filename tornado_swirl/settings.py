@@ -20,7 +20,7 @@ default_settings = {
     'description': 'Sample description',
     'servers': [],
     'api_key': '',
-    'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
+    'enabled_methods': ['get', 'post', 'put', 'patch', 'delete', 'head'],
     'exclude_namespaces': [],
     'tags': [],
 }

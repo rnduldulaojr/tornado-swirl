@@ -299,7 +299,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -333,7 +333,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -372,7 +372,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -409,7 +409,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -439,7 +439,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -462,7 +462,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -504,7 +504,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -535,7 +535,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
-            def post():
+            def post(self):
                 """This is the simple description.
                 With a second line.
 
@@ -559,3 +559,47 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['paths']['/test']
         assert obj['paths']['/test']['post']
         assert obj['paths']['/test']['post']['deprecated']
+
+
+    @gen_test
+    def test_enabled_methods(self):
+        self.reset_settings()
+        swirl.describe(title='My API', description='My description', enabled_methods=['head'])
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def head(self):
+                """This is a head method.
+
+                Test Head only method
+
+                Response:
+                    out (string) -- Hello World string
+                    
+                """
+                pass
+
+            def post(self):
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                [DEPRECATED]
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+       
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['head']
+        assert obj['paths']['/test'].get('post') == None

@@ -11,7 +11,7 @@ from tornado_swirl.handlers import swagger_handlers
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
     return (inspect.isfunction(obj) or inspect.ismethod(obj)) and \
-            obj.__name__ in ('get', 'post', 'put', 'delete', 'patch')
+            obj.__name__ in list(settings.default_settings.get('enabled_methods', []))
 
 
 def restapi(url, **kwargs):
