@@ -34,7 +34,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_1(self):
-
+        self.reset_settings()
         @swirl.restapi('/test')
         class HandlerTest(RequestHandler):
             def get(self):
@@ -66,7 +66,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_2(self):
-
+        self.reset_settings()
         @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
         class HandlerTest(RequestHandler):
             def post(self, a, b):
@@ -101,7 +101,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_3(self):
-
+        self.reset_settings()
         @swirl.restapi(r'/test/(?P<a>\w+)/(?P<b>\d+)')
         class HandlerTest(RequestHandler):
             def post(self, a, b):
@@ -151,6 +151,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_request_body_form_data(self):
+        self.reset_settings()
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
             def post(self, a, b):
@@ -183,6 +184,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_request_body_file_data(self):
+        self.reset_settings()
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
             def post(self, a, b):
@@ -206,7 +208,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         self.get_app().add_handlers(r".*", api_routes())
         response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
         obj = json.loads(response.body.decode('utf-8'))
-
+        print(obj)
         assert obj['paths']
         assert obj['paths']['/test/form']
         assert obj['paths']['/test/form']['post']
@@ -216,6 +218,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_request_body_model(self):
+        self.reset_settings()
         @swirl.restapi(r'/test/form')
         class HandlerTest(RequestHandler):
             def post(self, a, b):
@@ -260,7 +263,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_descriptions(self):
-
+        self.reset_settings()
         @swirl.restapi('/test')
         class HandlerTest(RequestHandler):
             def get(self):
@@ -295,7 +298,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_parse_with_multipart_request_body(self):
-
+        self.reset_settings()
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
@@ -405,7 +408,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_simple_parse_with_urlencoded_request_body(self):
-
+        self.reset_settings()
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
@@ -458,7 +461,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_schema_spec_descriptions(self):
-
+        self.reset_settings()
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
@@ -500,7 +503,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_deprecated(self):
-
+        self.reset_settings()
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
@@ -531,7 +534,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
 
     @gen_test
     def test_deprecated2(self):
-
+        self.reset_settings()
         @swirl.restapi("/test")
         class Handler(RequestHandler):
 
