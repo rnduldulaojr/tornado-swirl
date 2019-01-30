@@ -11,6 +11,16 @@ swirl.describe(title="My REST API", description="Example API that does wonders")
 
 ```
 
+Describe your REST API with enabled methods:
+
+```python
+import tornado_swirl as swirl
+
+swirl.describe(title="My REST API", description="Example API that does wonders",
+               enabled_methods=['get', 'post'])
+
+```
+
 ## Setting up Documenting Your Handlers and Models
 
 Swirl derives OpenAPI 3.0 paths and components from your docstrings.  At the moment Swirl only parses Google-style (like) formatted docstrings.
