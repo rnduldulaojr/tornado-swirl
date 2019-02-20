@@ -21,6 +21,23 @@ swirl.describe(title="My REST API", description="Example API that does wonders",
 
 ```
 
+
+Custom headers on the Swagger UI handlers and Spec:
+```python
+import tornado_swirl as swirl
+
+swirl.describe(title="My REST API", description="Example API that does wonders",
+               swagger_ui_handlers_header=[
+                   ('Cache-Control', 'public'),
+                   ('Cache-Control', 'max-age=300')
+               ],
+               swagger_spec_headers=[
+                   ('Cache-Control', 'no-cache')
+               ],)
+
+```
+
+
 ## Setting up Documenting Your Handlers and Models
 
 Swirl derives OpenAPI 3.0 paths and components from your docstrings.  At the moment Swirl only parses Google-style (like) formatted docstrings.
