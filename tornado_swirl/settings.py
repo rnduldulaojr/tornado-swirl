@@ -23,6 +23,9 @@ default_settings = {
     'enabled_methods': ['get', 'post', 'put', 'patch', 'delete', 'head'],
     'exclude_namespaces': [],
     'tags': [],
+
+    'swagger_ui_handlers_headers': [], #These should be list of tuples
+    'swagger_spec_headers': [],
 }
 
 class SwirlVars(object):
@@ -41,9 +44,9 @@ def add_global_tag(name, description=None, url=None):
     tag['name'] = name
     if description:
         tag['description'] = description
-    
+
     if url:
-        tag['externalDocs'] = { 'url': url }
+        tag['externalDocs'] = {'url': url}
     SwirlVars.GLOBAL_TAGS.append(tag)
 
 def add_api_handler(cls):

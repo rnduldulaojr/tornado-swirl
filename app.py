@@ -4,7 +4,11 @@ import tornado.web
 from tornado_swirl import api_routes
 from tornado_swirl.swagger import Application, describe, restapi, schema, add_global_tag
 
-describe(title='Test API', description='Just things to test')
+describe(title='Test API', description='Just things to test',
+         swagger_ui_handlers_headers=[
+             ('Cache-Control', 'public'),
+             ('Cache-Control', 'max-age=300')
+         ])
 add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
 
 # @restapi(url="/test")
@@ -124,13 +128,18 @@ add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
 @restapi('/withrequestbody5')
 class FooHandler5(tornado.web.RequestHandler):
 
-    def get(self, itemid):
+    def get(self):
+        """Get Item data.
+
+        Gets Item data from database.
+        """
+        pass
+
+    def post(self):
         """Get Item data.
 
         Gets Item data from database.
 
-        Deprecated
-        
         HTTP Headers: 
             Tt-I2ap-Id -- Uri.
             Tt-I2ap-Sec -- Some Hex token
@@ -139,6 +148,7 @@ class FooHandler5(tornado.web.RequestHandler):
             user (User) -- required. User data.
         """
         pass
+
 
 @schema
 class User(object):
@@ -154,6 +164,7 @@ class User(object):
             minimum: 1  maximum: 100
     """
     pass
+
 
 @restapi('/path/to/api')
 class MyHandler(tornado.web.RequestHandler):

@@ -14,7 +14,7 @@ import tornado.template
 import tornado.web
 from tornado.util import re_unescape
 
-import tornado_swirl.settings as settings
+from tornado_swirl import settings
 
 __author__ = 'rduldulao'
 
@@ -25,12 +25,20 @@ def json_dumps(obj, pretty=False):
                       sort_keys=True,
                       indent=4,
                       separators=(',', ': ')) \
-                      if pretty else json.dumps(obj)
+        if pretty else json.dumps(obj)
+
 
 class SwaggerUIHandler(tornado.web.RequestHandler):
     """Serves the Swagger UI"""
+
     def initialize(self, static_path, **kwds):
         self.static_path = static_path
+
+    def set_default_headers(self):
+        headers = settings.default_settings.get(
+            'swagger_ui_handlers_headers', [])  # type: list
+        for (key, value) in headers:
+            self.add_header(key, value)
 
     def get_template_path(self):
         return self.static_path
@@ -40,8 +48,15 @@ class SwaggerUIHandler(tornado.web.RequestHandler):
             self.request.full_url(), self.reverse_url(settings.URL_SWAGGER_API_SPEC))
         self.render('index.html', discovery_url=discovery_url)
 
+
 class SwaggerApiHandler(tornado.web.RequestHandler):
     """Openapi 3.0 spec generator class handler"""
+
+    def set_default_headers(self):
+        headers = settings.default_settings.get(
+            'swagger_spec_headers', [])  # type: list
+        for (key, value) in headers:
+            self.add_header(key, value)
 
     def get(self):
         """Get handler"""
@@ -62,11 +77,13 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             forwarded = self.request.headers.get('Forwarded', None)
             proto = None
             if forwarded:
-                protopart = [part.strip() for part in forwarded.split(';') if part.strip().startswith('proto')]
+                protopart = [part.strip() for part in forwarded.split(
+                    ';') if part.strip().startswith('proto')]
                 if protopart:
                     proto = protopart[0].split('=')[-1]
 
-            proto = proto or self.request.headers.get("X-Forwarded-Proto", None) or self.request.protocol
+            proto = proto or self.request.headers.get(
+                "X-Forwarded-Proto", None) or self.request.protocol
             servers = [{
                 'url': proto + "://" + server_host + "/",
                 'description': 'Default server'
@@ -152,7 +169,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         return paths
 
-    def __detect_content_from_type(self, val): # -> (str, bool, str):
+    def __detect_content_from_type(self, val):  # -> (str, bool, str):
         if val.type.name == "file":
             return "file", False, val.type.contents
         if val.type.name in settings.get_schemas().keys():
@@ -191,9 +208,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
     def __get_request_body(self, path_spec):
         contents = {}
         if path_spec.body_params:
-            files_detected = 0  #content = file:xxxx default text/plain
-            form_data_detected = 0 #application/x-www-form-urlencoded
-            models_detected = 0 #application/json or application/xml
+            files_detected = 0  # content = file:xxxx default text/plain
+            form_data_detected = 0  # application/x-www-form-urlencoded
+            models_detected = 0  # application/json or application/xml
 
             for (_, val) in path_spec.body_params.items():
                 _, ismodel, ftype = self.__detect_content_from_type(val)
@@ -220,12 +237,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 contents[entry.type.contents] = {
                     "schema": {
                         "type": "string",
-                        "format": "binary"  #TODO: When to use byte/base64?
+                        "format": "binary"  # TODO: When to use byte/base64?
                     }
                 }
-            elif (files_detected > 0 and \
+            elif (files_detected > 0 and
                   (form_data_detected > 0 or models_detected > 0)) or \
-                  models_detected > 1:
+                    models_detected > 1:
                 contents["multipart/form-data"] = {
                     "schema": {
                         "properties": {
@@ -273,12 +290,12 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
     @staticmethod
     def find_api():
         """Gets the API specs
-        
+
         Returns:
-            path, route_spec, opertiations:  Tuple 
+            path, route_spec, opertiations:  Tuple
                 path -- the API endpoint URL
                 route_spec -- the Tornado Request Handler class
-                operations -- list of tuples containing (method name, PathSpec object) 
+                operations -- list of tuples containing (method name, PathSpec object)
         """
         for route_spec in settings.api_routes():
             url, _ = _find_groups(route_spec[0])

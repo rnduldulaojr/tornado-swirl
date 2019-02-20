@@ -3,10 +3,8 @@
 import inspect
 import tornado.web
 
-import tornado_swirl.settings as settings
-from tornado_swirl import docparser
+from tornado_swirl import docparser, settings
 from tornado_swirl.handlers import swagger_handlers
-
 
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
