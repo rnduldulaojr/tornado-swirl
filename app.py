@@ -1,8 +1,11 @@
 import tornado.ioloop
 import tornado.web
+from tornado.gen import coroutine
 
 from tornado_swirl import api_routes
-from tornado_swirl.swagger import Application, describe, restapi, schema, add_global_tag
+from tornado_swirl.swagger import Application, describe, restapi, schema, add_global_tag, add_security_scheme
+from tornado_swirl.openapi import security
+
 
 describe(title='Test API', description='Just things to test',
          swagger_ui_handlers_headers=[
@@ -10,6 +13,7 @@ describe(title='Test API', description='Just things to test',
              ('Cache-Control', 'max-age=300')
          ])
 add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
+add_security_scheme("test_api_key", security.HTTP('bearer', 'JWT') )
 
 # @restapi(url="/test")
 # class MainHandler(tornado.web.RequestHandler):
@@ -110,20 +114,20 @@ add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
 #         """
 #         pass
 
-# @restapi('/withrequestbody4')
-# class FooHandler4(tornado.web.RequestHandler):
+@restapi('/chunky')
+class FooHandler4(tornado.web.RequestHandler):
 
-#     def get(self, itemid):
-#         """Get Item data.
-
-#         Gets Item data from database.
-
-#         Request Body:
-#             file (file:text/csv) -- CSV file.
-#             name (string) -- required. Foo name.
-#             user (User) -- required. User data.
-#         """
-#         pass
+    @coroutine
+    def get(self):
+        self.set_header('Content-Type', 'application/json')
+        self.write('{ "data": ')
+        self.write('"')
+        for i in range(1000):
+            
+            self.write('foobar')
+            yield self.flush()
+        self.write('" }')
+        yield self.flush()
 
 @restapi('/withrequestbody5')
 class FooHandler5(tornado.web.RequestHandler):
@@ -132,8 +136,11 @@ class FooHandler5(tornado.web.RequestHandler):
         """Get Item data.
 
         Gets Item data from database.
+
+        Security:
+            test_api_key
         """
-        pass
+        self.finish()
 
     def post(self):
         """Get Item data.

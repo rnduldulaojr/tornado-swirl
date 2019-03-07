@@ -52,6 +52,9 @@ def describe(title='Your API', description='No description', **kwargs):
 def add_global_tag(name, description=None, url=None):
     settings.add_global_tag(name, description, url)
 
+def add_security_scheme(name, scheme):
+    settings.add_security_scheme(name, scheme)
+
 class Application(tornado.web.Application):
     """Swirl Application class"""
 

@@ -117,6 +117,15 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
             )
 
+        security_schemes = settings.SwirlVars.SECURITY_SCHEMES  # type: dict
+        if security_schemes:
+            components = specs.get("components") or {}
+            components['securitySchemes'] = {}
+
+            for name, scheme in security_schemes.items():
+                components['securitySchemes'][name] = scheme.spec()
+            specs.update(components)
+
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
     def __get_schema_spec(self, cls):
@@ -167,6 +176,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             if api[1].tags:
                 paths[api[0]]["tags"] = self.__get_tags(api[1])
 
+            if api[1].security:
+                spec2 = self.__get_security_spec(api[1])
+                if spec2:
+                    paths[api[0]]["security"] = spec2
+
         return paths
 
     def __detect_content_from_type(self, val):  # -> (str, bool, str):
@@ -204,6 +218,20 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             if tag:
                 tag_list.append(tag.name)
         return tag_list
+
+    def __get_security_spec(self, path_spec):
+        specs = []
+        for name, schemes in path_spec.security.items():
+            spec = {}
+            scheme = settings.SwirlVars.SECURITY_SCHEMES.get(name)
+            if not scheme:
+                continue
+            if scheme.type not in ('oauth2', 'openIdConnect'):
+                spec[name] = []
+            else:
+                pass  # TODO: support oauth2 and openIdConnect
+            specs.append(spec)
+        return specs
 
     def __get_request_body(self, path_spec):
         contents = {}

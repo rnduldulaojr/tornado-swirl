@@ -34,6 +34,7 @@ class SwirlVars(object):
     ROUTES = []
     API_HANDLERS = []
     GLOBAL_TAGS = []
+    SECURITY_SCHEMES =  {}
 
 def get_api_handlers():
     """Returns REST API handlers"""
@@ -48,6 +49,9 @@ def add_global_tag(name, description=None, url=None):
     if url:
         tag['externalDocs'] = {'url': url}
     SwirlVars.GLOBAL_TAGS.append(tag)
+
+def add_security_scheme(name, scheme):
+    SwirlVars.SECURITY_SCHEMES[name] = scheme
 
 def add_api_handler(cls):
     """Adds a REST API handler class"""
