@@ -17,6 +17,7 @@ class PathSpec(object):
         self.properties = {}
         self.tags = {}
         self.deprecated = False
+        self.security = {}
 
 
 class SchemaSpec(object):

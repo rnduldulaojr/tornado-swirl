@@ -22,6 +22,7 @@ _RESPONSE_HEADERS = 'responses'
 _PROPERTY_HEADERS = 'properties'
 _TAGS_HEADERS = 'tags'
 _DEPRECATED_HEADERS = 'deprecated'
+_SECURITY_HEADERS = 'security'
 
 #data processors
 # objects
@@ -65,9 +66,24 @@ def _lookup_type_of(name):
         if name in names:
             return typ
     return str
+def _process_security_params(fsm_obj, ptype):
+    lines = fsm_obj.buffer.splitlines()
+    cleaned_lines = _clean_lines(lines)
+    params = {}
+    # parse the lines
+    for i, line in enumerate(cleaned_lines):
+        matcher = PARAM_MATCHER.match(line.lstrip())
+        if not matcher:
+            continue
+        #get name
+        name = matcher.group("name")
+        spec = matcher.group("description")
+        params[name] = spec.split(',') if spec else []
+    return params
 
+    
 def _process_params(fsm_obj, ptype, required_func=None):
-    # get buffer and conver
+    # get buffer and convert
     # first merge lines without -- to previous lines
     if required_func is None:
         required_func = lambda x, y: x == y
@@ -175,6 +191,10 @@ def _process_tags(fsm_obj, **kwargs):
     _set_default_type(fsm_obj.spec.tags, Type("string"))
     fsm_obj.buffer = ""
 
+def _process_security(fsm_obj, **kwargs):
+    fsm_obj.spec.security = _process_security_params(fsm_obj, "security")
+    fsm_obj.buffer = ""
+
 def _process_deprecated(fsm_obj, **kwargs):
     fsm_obj.spec.deprecated = True
     fsm_obj.buffer = ""
@@ -190,6 +210,8 @@ def _clean_lines(lines):
             cleaned_lines[-1] = cleaned_lines[-1] + " " + cur_line.strip()
     return cleaned_lines
 
+
+
 # Header regexes, buffer processor func
 _HEADERS = {
     _QUERY_HEADERS: (r"query param(s|eter(s)?)?:", _process_query),
@@ -203,7 +225,8 @@ _HEADERS = {
                         _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
     _TAGS_HEADERS:(r"tag(s?):", _process_tags),
-    _DEPRECATED_HEADERS: (r"(deprecated|\[deprecated\])", _process_deprecated)
+    _DEPRECATED_HEADERS: (r"(deprecated|\[deprecated\])", _process_deprecated),
+    _SECURITY_HEADERS: (r"security:", _process_security)
 }
 
 _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
