@@ -37,6 +37,23 @@ swirl.describe(title="My REST API", description="Example API that does wonders",
 
 ```
 
+Adding Security Schemes:
+```python
+from tornado_swirl as swirl
+from tornado_swirl.openapi import security
+
+swirl.describe(title="My REST API", description="Example API that does wonders")
+
+#setup security scheme
+scheme1 = security.APIKey('X-CUSTOM-KEY', location="header")
+scheme2 = security.HTTP('bearer', bearerFormat='JWT')
+
+swirl.add_security_scheme('my_custom_key', scheme1)
+swirl.add_security_scheme('my_http_key' , scheme2)
+
+
+```
+
 
 ## Setting up Documenting Your Handlers and Models
 
@@ -267,6 +284,7 @@ The section headers have definite possible values that are case insensitive.  Fo
 | HTTP Response | ^((http\s+)?((?P<code>\d+)\s+))?response:$ | ```HTTP 200 Response:```, ```201 Response:```,  ```Response:``` (Default 200) |
 | HTTP Error Response | ^(error(s\|\s\*response(s)?)?\|default(\s\*response(s)?)):$ | ```Errors:```, ```Error Responses:```, ```Default:``` |
 | Model Properties | ^(propert(y\|ies):)$ | ```Properties:``` or ```Property:``` |
+| Security | ^(security:) | ```Security:``` |
 | Tags | ^tags:$ | ```Tags:``` |
 
 TODO: HTTP Response Headers.
@@ -495,6 +513,34 @@ Tag:
     mytag
 """
 ```
+
+## Security
+
+You can set the security scheme of the API endpoint by adding a ```Security:``` section.  The items should 
+be described with the name registered with ```add_security_scheme(name, scheme)``` call.  If an unregistered
+name is used, it will be ignored in the generated swagger spec.
+
+```python
+"""With security scheme!
+
+Security:
+    my_custom_key
+"""
+```
+
+If more than one security scheme is specified, (for now) follow the standard parameter description 
+and use ```--``` for each scheme.
+
+```python
+"""With security scheme!
+
+Security:
+    my_custom_key --
+    my_http_key --
+"""
+```
+
+
 
 ## Documenting Schemas
 

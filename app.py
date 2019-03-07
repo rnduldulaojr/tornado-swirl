@@ -13,7 +13,8 @@ describe(title='Test API', description='Just things to test',
              ('Cache-Control', 'max-age=300')
          ])
 add_global_tag("internal", "Internal Use Only", "http://foo.com/tags")
-add_security_scheme("test_api_key", security.HTTP('bearer', 'JWT') )
+add_security_scheme("test_api_key", security.HTTP('bearer', 'JWT'))
+add_security_scheme("api_key", security.APIKey('X-API-KEY'))
 
 # @restapi(url="/test")
 # class MainHandler(tornado.web.RequestHandler):
@@ -138,7 +139,8 @@ class FooHandler5(tornado.web.RequestHandler):
         Gets Item data from database.
 
         Security:
-            test_api_key
+            api_key --
+            test_api_key -- 
         """
         self.finish()
 
