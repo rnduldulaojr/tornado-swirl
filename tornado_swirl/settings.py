@@ -26,6 +26,8 @@ default_settings = {
 
     'swagger_ui_handlers_headers': [], #These should be list of tuples
     'swagger_spec_headers': [],
+
+    'json_mime_type': 'application/json',
 }
 
 class SwirlVars(object):

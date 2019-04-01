@@ -6,6 +6,10 @@ import tornado.web
 from tornado_swirl import docparser, settings
 from tornado_swirl.handlers import swagger_handlers
 
+class Ref(object):
+    def __init__(self, value):
+        self.link = value
+
 def is_rest_api_method(obj):
     """Determines if function or method object is an HTTP method handler object"""
     return (inspect.isfunction(obj) or inspect.ismethod(obj)) and \
@@ -36,11 +40,30 @@ def restapi(url, **kwargs):
 def schema(cls):
     """REST API schema decorator"""
     name = cls.__name__
-    doc = inspect.getdoc(cls)
-    model_spec = docparser.parse_from_docstring(doc, spec='schema')
-    if model_spec:
-        cls.schema_spec = model_spec
-        settings.add_schema(name, cls)
+
+    #determine super class
+    mro = inspect.getmro(cls)
+    if not mro:
+        mro = (cls,)
+
+    mro = list(mro)
+    mro.reverse()
+    cls.schema_spec = []
+    for item in mro:
+        if item.__name__ == 'object':
+            continue
+        if item.__name__ == name:
+            doc = inspect.getdoc(item)
+            try:
+                model_spec = docparser.parse_from_docstring(doc, spec='schema')
+                if model_spec:
+                    cls.schema_spec.append(model_spec)
+                    settings.add_schema(name, cls)
+            except:
+                pass
+        else: #if class name is a superclass append a ref.
+            cls.schema_spec.append(Ref('#/components/schemas/{}'.format(item.__name__)))
+    
     return cls
 
 def describe(title='Your API', description='No description', **kwargs):

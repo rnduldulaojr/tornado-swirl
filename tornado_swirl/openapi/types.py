@@ -72,6 +72,8 @@ class Type(object):
         elif dtype in ("bool", "boolean"):
             return BoolType()
         # TODO:  support for object type
+        elif dtype == "object":
+            return ObjectType(**kwargs)
         return ModelType(dtype)
 
     @property
@@ -138,6 +140,14 @@ class BoolType(SchemaMixin):
     def __init__(self, **kwargs):
         self.name = 'boolean'
         self.kwargs = kwargs
+        self.format = None
+
+class ObjectType(SchemaMixin):
+    """Object type -- freeform"""
+    def __init__(self, **kwargs):
+        self.name = 'object'
+        self.kwargs = kwargs
+        self.kwargs.update({"additionalProperties": True})
         self.format = None
 
 
