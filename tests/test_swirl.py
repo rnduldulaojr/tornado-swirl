@@ -29,6 +29,7 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
             'api_key': '',
             'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
             'exclude_namespaces': [],
+            'json_mime_type': 'application/json'
         }
 
 

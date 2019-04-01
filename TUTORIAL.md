@@ -334,6 +334,7 @@ The following are the values that can be used as types:
 * More string types (via format): ```date```, ```date-time```, ```password```, ```byte```, ```binary```, ```email```, ```uuid```, ```uri```, ```hostname```, ```ipv4```, ```ipv6```,  These are all ```string``` formats.  The resulting schema for the variable would be for example: ```{"type": "string", "format": "date-time"}```
 * Boolean Type:  ```boolean``` or ```bool```
 * File Type:  ```file```.  File type schema will come out as ```{"type": "string", "format": "binary"}```.  TODO:  alternative file formats
+* Object Type: ```object```.  Free form object.
 
 ## Simple Variable Types with Explicit Format and File Types
 
@@ -428,6 +429,18 @@ Request Body:
 }
 ```
 
+## ```object``` Type
+
+Free form objects.
+
+```
+"""
+Request Body:
+    data (object) -- Free form object.
+"""
+```
+
+
 
 ## Combination Types:  ```anyOf```, ```allOf```, ```oneOf```, ```not```
 
@@ -457,6 +470,68 @@ Resulting Spec:
     }
   }
 }
+```
+
+## Schema Inheritance
+
+Swirl will now go up the inheritance tree (MRO) to get references to the current schema's superclasses (except object).
+
+```python
+@schema
+class User(object):
+    """User object
+    
+    Properties:
+        name (string) -- Required.  User name.
+    """
+
+@schema
+class Admin(User):
+    """Admin User
+
+    Properties:
+       superpowers ([string]) -- List of superpowers.
+    """
+```
+
+-- will produce:
+
+```json
+"components":{  
+   "schemas":{  
+      "User":{  
+         "type":"object",
+         "description":"User object",
+         "required":[  
+            "name"
+         ],
+         "properties":{  
+            "name":{  
+               "type":"string",
+               "description":"The name"
+            }
+         }
+      },
+      "Admin":{  
+         "allOf":[  
+            {  
+               "$ref":"#/components/schemas/User"
+            },
+            {  
+               "type":"object",
+               "description":"Admin User",
+               "properties":{  
+                  "superpowers":{  
+                     "type":"array",
+                     "items":{  
+                        "type":"string"
+                     },
+                     "description":"list of superpowers"
+                  }
+               }
+            }
+         ]
+      
 ```
 
 ## Documenting Responses

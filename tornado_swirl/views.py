@@ -14,7 +14,7 @@ import tornado.template
 import tornado.web
 from tornado.util import re_unescape
 
-from tornado_swirl import settings
+from tornado_swirl import settings, swagger
 
 __author__ = 'rduldulao'
 
@@ -129,22 +129,38 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
     def __get_schema_spec(self, cls):
-        spec = cls.schema_spec
-        props = [(prop.name, self._prop_to_dict(prop), prop.required)
-                 for (_, prop) in spec.properties.items()]
+        specs = list(cls.schema_spec)
+        val = {}
+        if len(specs) > 1:
+            val = {"allOf": []}
+            while len(specs) > 1:
+                spec, specs = specs[0], specs[1:]
+                if isinstance(spec, swagger.Ref):
+                    val["allOf"].append({"$ref": spec.link})
 
-        required = [name for name, _, req in props if req]
+            
+        if len(specs) == 1: 
+            props = [(prop.name, self._prop_to_dict(prop), prop.required)
+                    for (_, prop) in specs[0].properties.items()]
 
-        val = {"type": "object"}
-        val['description'] = spec.description or spec.summary
-        if required:
-            val.update({"required": required})
+            required = [name for name, _, req in props if req]
+            obj = {"type": "object"}
+            obj['description'] = specs[0].description or specs[0].summary
+            if required:
+                obj.update({"required": required})
 
-        val.update({
-            "properties": {
-                name: d for name, d, r in props
-            }
-        })
+            obj.update({
+                "properties": {
+                    name: d for name, d, r in props
+                }
+            })
+
+
+            if not val.get("allOf"):
+                val = obj
+            else:
+                val["allOf"].append(obj)
+
 
         return val
 
@@ -188,6 +204,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             return "file", False, val.type.contents
         if val.type.name in settings.get_schemas().keys():
             return val.type.name, True, None
+        if val.type.name == 'object':
+            return 'object', True, None
 
         return val.type.name, False, None
 
@@ -281,7 +299,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
             elif models_detected == 1 and not files_detected and not form_data_detected:
                 params_entry = list(path_spec.body_params.values())[0]
-                file_type = 'application/json'
+                file_type = settings.default_settings.get('json_mime_type')
+                
                 contents[file_type] = {
                     "schema":  params_entry.type.schema
                 }
@@ -310,7 +329,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
         if param.type.name in ("integer", "number", "string", "boolean"):
             return {"text/plain": {"schema": param.type.schema}}
-        return {"application/json": {"schema": param.type.schema}}
+        return {settings.default_settings.get('json_mime_type'): {"schema": param.type.schema}}
 
     def __get_type(self, param):
         return {"schema": param.type.schema}

@@ -154,7 +154,7 @@ class FooHandler5(tornado.web.RequestHandler):
             Tt-I2ap-Sec -- Some Hex token
 
         Request Body:
-            user (User) -- required. User data.
+            user (object) -- required. User data.
         """
         pass
 
@@ -173,6 +173,14 @@ class User(object):
             minimum: 1  maximum: 100
     """
     pass
+
+@schema
+class Admin(User):
+    """Admin is a User
+
+    Properties:
+        superpowers ([string]) -- list of superpowers.
+    """
 
 
 @restapi('/path/to/api')
@@ -208,6 +216,9 @@ class ErrorResponse(object):
     Properties:
         code (int) -- Required.  Error code.
         message (string) -- Error description.
+            readOnly: true
+        details (object) -- Object
+            minProperties: 2
     """
     pass
 
@@ -219,5 +230,5 @@ def make_app():
 if __name__ == "__main__":
     app = make_app()
     app.debug = True
-    app.listen(8888)
+    app.listen(8001)
     tornado.ioloop.IOLoop.current().start()
