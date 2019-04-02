@@ -534,6 +534,51 @@ class Admin(User):
       
 ```
 
+## Schema Example/Examples.
+
+To include Schema object examples, add a Meta class inside the schema class with either ```example``` or ```examples``` class attribute.  NOTE: Current swagger UI does not display multiple examples.
+
+```python
+@schema
+class User:
+    """User data
+
+    Properties:
+        name (string) -- Name of user.
+        age (int) -- age of user.
+    """
+    class Meta:
+        example = {
+            "name": "Ron",
+            "age": 15,
+        }
+```
+
+
+For multiple examples:
+
+```python
+@schema
+class User:
+    """User data
+
+    Properties:
+        name (string) -- Name of user.
+        age (int) -- age of user.
+    """
+    class Meta:
+        examples = {
+            "Ron" : {
+                   "name": "Ron",
+                   "age": 15,
+                  },
+            "Don" : {
+                   "name": "Don",
+                   "age": 16,
+                  },
+        }
+```
+
 ## Documenting Responses
 
 The following can be used as section headers for HTTP 200 Ok responses:
