@@ -228,6 +228,7 @@ def make_app():
 
 
 if __name__ == "__main__":
+    print("Test app")
     app = make_app()
     app.debug = True
     app.listen(8001)

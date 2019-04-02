@@ -20,7 +20,7 @@ __author__ = 'rduldulao'
 
 
 def json_dumps(obj, pretty=False):
-    """REturns JSON string"""
+    """Returns JSON string"""
     return json.dumps(obj,
                       sort_keys=True,
                       indent=4,
