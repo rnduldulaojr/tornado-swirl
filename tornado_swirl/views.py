@@ -20,7 +20,7 @@ __author__ = 'rduldulao'
 
 
 def json_dumps(obj, pretty=False):
-    """REturns JSON string"""
+    """Returns JSON string"""
     return json.dumps(obj,
                       sort_keys=True,
                       indent=4,
@@ -138,10 +138,9 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 if isinstance(spec, swagger.Ref):
                     val["allOf"].append({"$ref": spec.link})
 
-            
-        if len(specs) == 1: 
+        if len(specs) == 1:
             props = [(prop.name, self._prop_to_dict(prop), prop.required)
-                    for (_, prop) in specs[0].properties.items()]
+                     for (_, prop) in specs[0].properties.items()]
 
             required = [name for name, _, req in props if req]
             obj = {"type": "object"}
@@ -155,12 +154,15 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                 }
             })
 
-
             if not val.get("allOf"):
                 val = obj
             else:
                 val["allOf"].append(obj)
 
+            if specs[0].example:
+                val["example"] = specs[0].example
+            elif specs[0].examples:
+                val["examples"] = specs[0].examples
 
         return val
 
@@ -300,7 +302,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             elif models_detected == 1 and not files_detected and not form_data_detected:
                 params_entry = list(path_spec.body_params.values())[0]
                 file_type = settings.default_settings.get('json_mime_type')
-                
+
                 contents[file_type] = {
                     "schema":  params_entry.type.schema
                 }

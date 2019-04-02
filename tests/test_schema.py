@@ -86,3 +86,59 @@ class TestSampleEndpoints2(AsyncHTTPTestCase):
         assert schemas['B']['allOf']
         assert schemas['B']['allOf'][0]
         assert schemas['B']['allOf'][1]
+
+    @gen_test
+    def test_simple_2(self):
+        self.reset_settings()
+
+        @swirl.restapi('/test')
+        class HandlerTest(RequestHandler):
+            def get(self):
+                """This is a simple test get.
+
+                This is a simple description.
+
+                Query Parameters:
+                    foo (string) -- Optional. Simple query string.
+
+                Response:
+                    test (B) -- An output.
+                """
+                self.finish()
+        @swirl.schema
+        class A(object):
+            """Parent class
+
+            Properties:
+                name (string) -- Test name.
+                age (int) -- Age
+            """
+
+            class Meta:
+                example = {
+                    "name": "Alex",
+                    "age": 1,
+                }
+
+
+        
+
+        self._app.add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['get']
+
+        handler = obj['paths']['/test']['get']
+        assert handler['responses']
+        assert handler['responses']['200']
+        assert handler['responses']['200']['description'] == 'An output.'
+        assert handler['responses']['200']['content']['application/json']['schema']
+        assert handler['responses']['200']['content']['application/json']['schema']['$ref']
+
+        schemas = obj['components']['schemas']
+        assert schemas
+        assert schemas['A']
+        assert schemas['A']['example']
+        assert schemas['A']['example']['name'] == 'Alex'

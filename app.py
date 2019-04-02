@@ -158,6 +158,17 @@ class FooHandler5(tornado.web.RequestHandler):
         """
         pass
 
+@restapi('/withrequestbody6')
+class FooHandler6(tornado.web.RequestHandler):
+
+    
+    def post(self):
+        """Create Admin
+
+        Request Body:
+            user (Admin) -- required. User data.
+        """
+        pass
 
 @schema
 class User(object):
@@ -181,6 +192,26 @@ class Admin(User):
     Properties:
         superpowers ([string]) -- list of superpowers.
     """
+    # class Meta:
+    #     examples = {
+    #         "Ron": {
+    #             "name": "Ronald",
+    #             "age": 10,
+    #             "superpowers": ["a", "b", "c"]
+    #         },
+    #         "Don": {
+    #             "name": "McDonald",
+    #             "age": 12,
+    #             "superpowers": ["c", "d", "e"]
+    #         }
+    #     }
+    class Meta:
+        example = {
+                "name": "Ronald",
+                "age": 10,
+                "superpowers": ["a", "b", "c"]
+            }
+    
 
 
 @restapi('/path/to/api')
@@ -192,7 +223,7 @@ class MyHandler(tornado.web.RequestHandler):
 
         Query Parameters:
             date (date) -- Required.  The target date.
-            sort (enum[asc, desc]) -- Optional.  Sort order.
+            sort (enum[asc, desc, with-params]) -- Optional.  Sort order.
             items (int) -- Optional.  Number of items to display.
                 minimum: 100    maximum: 200
 
@@ -200,6 +231,7 @@ class MyHandler(tornado.web.RequestHandler):
             items ([string]) -- List of random strings.
 
         Error Responses:
+            200 (Admin) -- Test Admin.
             400 (ErrorResponse) -- Bad Request.
             500 (ErrorResponse) -- Internal Server Error.
 
@@ -220,7 +252,15 @@ class ErrorResponse(object):
         details (object) -- Object
             minProperties: 2
     """
-    pass
+    class Meta:
+        example = {
+            "code": 400,
+            "message": "Some message",
+            "details": {
+                "foo": True,
+                "bar": False
+            }
+        }
 
 
 def make_app():
@@ -228,6 +268,7 @@ def make_app():
 
 
 if __name__ == "__main__":
+    print("Test app")
     app = make_app()
     app.debug = True
     app.listen(8001)
