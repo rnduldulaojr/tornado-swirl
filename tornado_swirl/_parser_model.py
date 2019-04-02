@@ -29,6 +29,8 @@ class SchemaSpec(object):
         self.description = ""
         self.deprecated = False
         self.properties = {}
+        self.example = None
+        self.examples = None
 
 
 class Param(object):

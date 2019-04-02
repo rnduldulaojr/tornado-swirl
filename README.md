@@ -10,7 +10,8 @@ The main idea for this project is to automatically extract API specs from the us
 
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
-## Current Release:
+## Releases:
+* V. 0.1.18 -- Added support for ```example```/```examples``` for schema model types, bug fix on enum values with dash, updated swagger UI resources, code cleanup.
 * V. 0.1.17 -- Added support for ```object``` (freeform object) type, added support for schema inheritance, and ```json_mime_type``` option in ```swirl.describe(...)``` to enable JSON:API authors to specify ```application/vnd.api+json```.
 * V. 0.1.16 -- Added support for OpenAPI ```securityScheme```  and path ```security``` spec.  Support for ```apiKey``` and ```http``` security schemes.
 * V. 0.1.15 -- Added swagger_ui_handlers_headers and swagger_spec_headers as ```describe()``` keyword arguments, adding of

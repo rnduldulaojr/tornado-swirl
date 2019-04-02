@@ -24,9 +24,9 @@ _TAGS_HEADERS = 'tags'
 _DEPRECATED_HEADERS = 'deprecated'
 _SECURITY_HEADERS = 'security'
 
-#data processors
+# data processors
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w\-, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)
@@ -34,6 +34,8 @@ ERRORSPEC_REGEX = r"^(?P<code>\d+)\s*--\s*(?P<description>.*)$"
 ERRORSPEC_MATCHER = re.compile(ERRORSPEC_REGEX, re.IGNORECASE)
 
 # _PROP_SPEC_REGEX = re.compile("(?P<name>\w+): (?P<value>\w[\w\s]*)")}
+
+
 class Number(numbers.Number):
     """Convenience type class to represent float or int"""
     def __new__(cls, val):
@@ -46,6 +48,7 @@ class Number(numbers.Number):
             return int(val)
         except ValueError:
             return val
+
 
 class Boolean(object):
     """Convenience type class to convert bool values"""
@@ -61,11 +64,14 @@ _PROPS_TYPE_LOOKUP = {
              'minProperties', 'maxProperties')
 }
 
+
 def _lookup_type_of(name):
     for typ, names in _PROPS_TYPE_LOOKUP.items():
         if name in names:
             return typ
     return str
+
+
 def _process_security_params(fsm_obj, ptype):
     lines = fsm_obj.buffer.splitlines()
     cleaned_lines = _clean_lines(lines)
@@ -75,13 +81,13 @@ def _process_security_params(fsm_obj, ptype):
         matcher = PARAM_MATCHER.match(line.lstrip())
         if not matcher:
             continue
-        #get name
+        # get name
         name = matcher.group("name")
         spec = matcher.group("description")
         params[name] = spec.split(',') if spec else []
     return params
 
-    
+
 def _process_params(fsm_obj, ptype, required_func=None):
     # get buffer and convert
     # first merge lines without -- to previous lines
@@ -137,21 +143,26 @@ def _get_description_props(description):
 
     return description, kwargs
 
+
 def _set_default_type(dval, dtype):
     for (name, param) in dval.items():
         if param.type.name == "None":
             dval[name].type = dtype
+
 
 def _process_query(fsm_obj, **kwargs):
     fsm_obj.spec.query_params = _process_params(fsm_obj, "query")
     _set_default_type(fsm_obj.spec.query_params, Type("string"))
     fsm_obj.buffer = ""
 
+
 def _process_body(fsm_obj, **kwargs):
-    fsm_obj.spec.body_params = _process_params(fsm_obj, "body", lambda x, y: True)
-    #check the params and guess the content type
+    fsm_obj.spec.body_params = _process_params(
+        fsm_obj, "body", lambda x, y: True)
+    # check the params and guess the content type
     _set_default_type(fsm_obj.spec.body_params, Type("string"))
     fsm_obj.buffer = ''
+
 
 def _process_cookie(fsm_obj, **kwargs):
     fsm_obj.spec.cookie_params = _process_params(fsm_obj, "cookie")
@@ -161,7 +172,7 @@ def _process_cookie(fsm_obj, **kwargs):
 
 def _process_header(fsm_obj, **kwargs):
     fsm_obj.spec.header_params = _process_params(fsm_obj, "header")
-    #convert all types to string if None
+    # convert all types to string if None
     _set_default_type(fsm_obj.spec.header_params, Type("string"))
     fsm_obj.buffer = ""
 
@@ -177,27 +188,33 @@ def _process_response(fsm_obj, **kwargs):
         })
     fsm_obj.buffer = ""
 
+
 def _process_properties(fsm_obj, **kwargs):
     fsm_obj.spec.properties = _process_params(fsm_obj, "property")
     _set_default_type(fsm_obj.spec.properties, Type("string"))
     fsm_obj.buffer = ""
 
+
 def _process_errors(fsm_obj, **kwargs):
     fsm_obj.spec.responses.update(_process_params(fsm_obj, "response"))
     fsm_obj.buffer = ""
+
 
 def _process_tags(fsm_obj, **kwargs):
     fsm_obj.spec.tags = _process_params(fsm_obj, "tags")
     _set_default_type(fsm_obj.spec.tags, Type("string"))
     fsm_obj.buffer = ""
 
+
 def _process_security(fsm_obj, **kwargs):
     fsm_obj.spec.security = _process_security_params(fsm_obj, "security")
     fsm_obj.buffer = ""
 
+
 def _process_deprecated(fsm_obj, **kwargs):
     fsm_obj.spec.deprecated = True
     fsm_obj.buffer = ""
+
 
 def _clean_lines(lines):
     cleaned_lines, lines = [lines[0].strip()], lines[1:]
@@ -209,7 +226,6 @@ def _clean_lines(lines):
         except ValueError:
             cleaned_lines[-1] = cleaned_lines[-1] + " " + cur_line.strip()
     return cleaned_lines
-
 
 
 # Header regexes, buffer processor func
@@ -224,7 +240,7 @@ _HEADERS = {
     _RESPONSE_HEADERS: (r"(((http\s+)?((?P<code>\d+)\s+))?response|return(s?)):",
                         _process_response),
     _PROPERTY_HEADERS: (r"(propert(y|ies):)", _process_properties),
-    _TAGS_HEADERS:(r"tag(s?):", _process_tags),
+    _TAGS_HEADERS: (r"tag(s?):", _process_tags),
     _DEPRECATED_HEADERS: (r"(deprecated|\[deprecated\])", _process_deprecated),
     _SECURITY_HEADERS: (r"security:", _process_security)
 }
@@ -234,7 +250,8 @@ _HEADERS_REGEX = {key: (re.compile("^"+val+"$", re.IGNORECASE), processor)
 _ALL_HEADERS = '|'.join([rs for (rs, _) in _HEADERS.values()])
 _ALL_HEADERS_REGEX = re.compile("^("+_ALL_HEADERS+")$", re.IGNORECASE)
 _SECTION_HEADER_REGEX = re.compile(r"^([\w ]+):$")
-_DEPRECATED_HEADER_REGEX = re.compile(r"^(deprecated|\[deprecated\])$", re.IGNORECASE)
+_DEPRECATED_HEADER_REGEX = re.compile(
+    r"^(deprecated|\[deprecated\])$", re.IGNORECASE)
 
 S_START = 0
 S_SUMMARY = 1
@@ -301,6 +318,7 @@ def _transition_description(fsm_obj):
 
 # conditions
 
+
 def _is_generic_line(line):
     line = line.strip()
     if _SECTION_HEADER_REGEX.match(line):
@@ -313,14 +331,18 @@ def _is_generic_line(line):
         return False
     return True
 
+
 def _is_end(line):
     return line.strip() == "--THE END--"
+
 
 def _is_blank_line(line):
     return line.strip() == ""
 
+
 def _is_generic_line_or_blank(line):
     return _is_generic_line(line) or _is_blank_line(line)
+
 
 def _is_section_header(line):
     stripped = line.strip()
@@ -359,6 +381,7 @@ FSM_MAP = (
     {'src': S_DESCRIPTION, 'dst': S_END, 'condition': _is_end,
      'callback': _transition_processbuffer},
 )
+
 
 class _ParseFSM:
     """Internal line docstring parser"""

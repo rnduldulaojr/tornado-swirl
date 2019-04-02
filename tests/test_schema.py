@@ -88,7 +88,7 @@ class TestSampleEndpoints2(AsyncHTTPTestCase):
         assert schemas['B']['allOf'][1]
 
     @gen_test
-    def test_simple_1(self):
+    def test_simple_2(self):
         self.reset_settings()
 
         @swirl.restapi('/test')
@@ -140,8 +140,5 @@ class TestSampleEndpoints2(AsyncHTTPTestCase):
         schemas = obj['components']['schemas']
         assert schemas
         assert schemas['A']
-        assert schemas['B']
-        assert schemas['B']['allOf']
-        assert schemas['B']['allOf'][0]
-        assert schemas['B']['allOf'][1]
-
+        assert schemas['A']['example']
+        assert schemas['A']['example']['name'] == 'Alex'

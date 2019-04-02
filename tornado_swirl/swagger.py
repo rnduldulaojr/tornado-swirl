@@ -59,6 +59,11 @@ def schema(cls):
                 if model_spec:
                     cls.schema_spec.append(model_spec)
                     settings.add_schema(name, cls)
+                    if hasattr(cls, 'Meta'):
+                        if hasattr(cls.Meta, 'example'):
+                            model_spec.example = cls.Meta.example
+                        if hasattr(cls.Meta, 'examples'):
+                            model_spec.examples = cls.Meta.examples
             except:
                 pass
         else: #if class name is a superclass append a ref.
