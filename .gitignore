@@ -37,3 +37,5 @@ nosetests.xml
 
 *.iml
 *.swp
+
+\.venv/

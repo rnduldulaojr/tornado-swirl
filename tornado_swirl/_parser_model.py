@@ -37,11 +37,12 @@ class Param(object):
     """REST API section parameter"""
 
     def __init__(self, name, dtype='string', ptype='path',
-                 required=False, description=None, order=0):
+                 required=False, readwrite=None, description=None, order=0):
         self.name = name
         self.type = dtype
         self.ptype = ptype
         self.required = required
+        self.readwrite = readwrite
         self.description = description
         self.order = order
         self.kwargs = {}
