@@ -139,10 +139,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
                     val["allOf"].append({"$ref": spec.link})
 
         if len(specs) == 1:
-            props = [(prop.name, self._prop_to_dict(prop), prop.required)
+            props = [(prop.name, self._prop_to_dict(prop), prop.required, prop.readwrite)
                      for (_, prop) in specs[0].properties.items()]
 
-            required = [name for name, _, req in props if req]
+            required = [name for name, _, req, rw in props if req]
             obj = {"type": "object"}
             obj['description'] = specs[0].description or specs[0].summary
             if required:
@@ -150,7 +150,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
             obj.update({
                 "properties": {
-                    name: d for name, d, r in props
+                    name: d for name, d, r, rw in props
                 }
             })
 
@@ -172,6 +172,10 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             schema.update(prop.kwargs)
         if prop.description:
             schema.update({"description": prop.description})
+        if prop.readwrite == 'readonly':
+            schema.update({'readOnly': True})
+        elif prop.readwrite == 'writeonly':
+            schema.update({'writeOnly': True})
         return schema
 
     def __get_api_spec(self, spec, operations):

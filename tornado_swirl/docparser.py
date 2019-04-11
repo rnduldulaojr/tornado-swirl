@@ -26,7 +26,7 @@ _SECURITY_HEADERS = 'security'
 
 # data processors
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w\-, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w\-, :\/\[\]]+)\)?)?\s*(--((\s+(?P<required>required|optional)\.)?(\s+(?P<readwrite>readonly|writeonly)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)
@@ -105,6 +105,7 @@ def _process_params(fsm_obj, ptype, required_func=None):
         open_type = matcher.group('type')
         param = Param(name=matcher.group('name'),
                       ptype=ptype,
+                      readwrite=matcher.group('readwrite'),
                       required=required_func(str(matcher.group('required')
                                                  ).lower(), "required"),
                       order=i,

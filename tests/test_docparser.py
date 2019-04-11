@@ -366,5 +366,65 @@ def test_param_props():
     assert path_spec.properties.get('age').description.strip() == 'The age.'
     assert path_spec.properties.get('age').type.kwargs.get('minimum') == 1
 
+def test_schema_readonly_properties():
+    docstring = """Test schema
 
-    
+    This is something
+
+    Properties:
+        id (int) -- readonly. The id.
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    pp = path_spec.properties.get('id')
+    assert pp.readwrite == 'readonly'
+    assert pp.required is False
+    assert pp.description == 'The id.'
+
+
+def test_schema_writeonly_properties():
+    docstring = """Test schema
+
+    This is something
+
+    Properties:
+        id (int) -- writeonly. The id.
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    pp = path_spec.properties.get('id')
+    assert pp.readwrite == 'writeonly'
+    assert pp.required is False
+    assert pp.description == 'The id.'
+
+
+def test_schema_required_readonly_properties():
+    docstring = """Test schema
+
+    This is something
+
+    Properties:
+        id (int) -- required. readonly. The id.
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    pp = path_spec.properties.get('id')
+    assert pp.readwrite == 'readonly'
+    assert pp.required
+    assert pp.description == 'The id.'
+
+
+def test_schema_required_writeonly_properties():
+    docstring = """Test schema
+
+    This is something
+
+    Properties:
+        id (int) -- required. writeonly. The id.
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    pp = path_spec.properties.get('id')
+    assert pp.readwrite == 'writeonly'
+    assert pp.required
+    assert pp.description == 'The id.'
