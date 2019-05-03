@@ -26,7 +26,7 @@ _SECURITY_HEADERS = 'security'
 
 # data processors
 # objects
-QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\w_0-9]*)(\s+\((?P<type>[\w\-, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
+QUERYSPEC_REGEX = r"^(?P<name>[\w][\-\[\]\w_0-9]*)(\s+\((?P<type>[\w\-, :/\[\]]+)\)?)?\s*(--(\s+((?P<required>required|optional)\.)?(?P<description>.*)?)?)?$"
 PARAM_MATCHER = re.compile(QUERYSPEC_REGEX, re.IGNORECASE)
 RESPONSE_REGEX = r"^((http\s+)?((?P<code>\d+)\s+))?response:$"
 RESPONSE_MATCHER = re.compile(RESPONSE_REGEX, re.IGNORECASE)

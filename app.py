@@ -246,6 +246,7 @@ class ErrorResponse(object):
     """Error response object.
 
     Properties:
+        type (enum[job-errors, 2]) -- Job Errors
         code (int) -- Required.  Error code.
         message (string) -- Error description.
             readOnly: true
