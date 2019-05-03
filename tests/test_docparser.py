@@ -367,4 +367,17 @@ def test_param_props():
     assert path_spec.properties.get('age').type.kwargs.get('minimum') == 1
 
 
+def test_square_brackets_in_name():
+    docstring = """Test doc
+
+    This is something
+
+    Query Parameters:
+        filter[job_id] (string) -- filter for job_id
+
+
+    """
+    path_spec = parse_from_docstring(docstring)
+    assert path_spec.query_params
+    assert path_spec.query_params.get('filter[job_id]')
     
