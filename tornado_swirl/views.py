@@ -318,10 +318,11 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             if param:
                 params[param.name] = {
                     "description": param.description,
-                    "content":
-                        # should return default produces if none, otherwise detect from type
-                        self._detect_content(param)
                 }
+                # should return default produces if none, otherwise detect from type
+                content = self._detect_content(param)
+                if content:
+                    params[param.name]['content'] = content
                 # TODO: implement examples
         return params
 
