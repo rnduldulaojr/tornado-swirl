@@ -60,7 +60,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
     def get(self):
         """Get handler"""
-        self.set_header('content-type', 'application/json')
+        self.set_header('content-type', settings.default_settings.get('json_mime_type'))
         apis = self.find_api()  # this is a generator
         servers = []
         server_settings = settings.default_settings.get("servers")
