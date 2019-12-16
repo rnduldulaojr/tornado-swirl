@@ -28,8 +28,7 @@ class HTTP(SecurityScheme):
     
     def __init__(self, scheme, bearerFormat=None):
         self.scheme = scheme
-        if str(scheme).lower() == 'bearer':
-            self.bearerFormat = bearerFormat
+        self.bearerFormat = bearerFormat
 
     @property
     def type(self):
