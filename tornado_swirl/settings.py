@@ -25,8 +25,10 @@ default_settings = {
     'tags': [],
 
     'swagger_ui_handlers_headers': [], #These should be list of tuples
-    'swagger_spec_headers': [],
-
+    'swagger_spec_headers': [
+        ('Cache-Control', 'no-cache, no-store, must-revalidate'),
+        ('Pragma', 'no-cache'),
+    ],
     'json_mime_type': 'application/json',
 }
 
