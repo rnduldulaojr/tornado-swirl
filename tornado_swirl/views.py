@@ -85,7 +85,7 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
             proto = proto or self.request.headers.get(
                 "X-Forwarded-Proto", None) or self.request.protocol
             servers = [{
-                'url': proto + "://" + server_host + "/",
+                'url': proto + "://" + server_host,
                 'description': 'Default server'
             }]
 
@@ -124,8 +124,8 @@ class SwaggerApiHandler(tornado.web.RequestHandler):
 
             for name, scheme in security_schemes.items():
                 components['securitySchemes'][name] = scheme.spec()
-            specs.update(components)
-
+            #specs.update(components)
+        
         self.finish(json_dumps(specs, self.get_arguments('pretty')))
 
     def __get_schema_spec(self, cls):

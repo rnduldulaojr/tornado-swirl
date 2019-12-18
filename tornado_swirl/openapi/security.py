@@ -3,6 +3,7 @@ Contains classes for security types.
 """
 
 class SecurityScheme(object):
+    """Represents security scheme"""
     pass
 
 class APIKey(SecurityScheme):
@@ -24,8 +25,8 @@ class APIKey(SecurityScheme):
 class HTTP(SecurityScheme):
     Schemes = ['basic', 'bearer', 'digest', 'hoba', 'mutual', 'negotiate', 'oauth', 'scram-sha-1', 
                'scram-sha-256', 'vapid']  #from http://www.iana.org/assignments/http-authschemes/http-authschemes.xhtml
-    
-    
+
+
     def __init__(self, scheme, bearerFormat=None):
         self.scheme = scheme
         self.bearerFormat = bearerFormat
@@ -33,7 +34,7 @@ class HTTP(SecurityScheme):
     @property
     def type(self):
         return "http"
-    
+
     def spec(self):
         sp = {
             "type": "http",
@@ -42,7 +43,3 @@ class HTTP(SecurityScheme):
         if self.bearerFormat:
             sp["bearerFormat"] =  self.bearerFormat
         return sp
-    
-
-
-

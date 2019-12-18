@@ -47,9 +47,12 @@ swirl.describe(title="My REST API", description="Example API that does wonders")
 #setup security scheme
 scheme1 = security.APIKey('X-CUSTOM-KEY', location="header")
 scheme2 = security.HTTP('bearer', bearerFormat='JWT')
+scheme3 = security.HTTP('basic')
 
 swirl.add_security_scheme('my_custom_key', scheme1)
 swirl.add_security_scheme('my_http_key' , scheme2)
+swirl.add_security_scheme('my_http_key2' , scheme3)
+
 
 
 ```
