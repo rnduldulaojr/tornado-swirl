@@ -1,4 +1,4 @@
-# pylint: disable=W0611
+# pylint: disable=W0611, line-too-long, unused-argument
 """Docstring line parser implementation.
 
 Returns:
@@ -77,7 +77,7 @@ def _process_security_params(fsm_obj, ptype):
     cleaned_lines = _clean_lines(lines)
     params = {}
     # parse the lines
-    for i, line in enumerate(cleaned_lines):
+    for _, line in enumerate(cleaned_lines):
         matcher = PARAM_MATCHER.match(line.lstrip())
         if not matcher:
             continue

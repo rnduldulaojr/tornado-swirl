@@ -1,6 +1,7 @@
 #pylint: disable=all
 import tornado_swirl.swagger as swirl
 import tornado_swirl.settings as settings
+import tornado_swirl.openapi.security as security
 from tornado_swirl import api_routes
 from tornado.testing import AsyncHTTPTestCase, gen_test
 from tornado.web import RequestHandler
@@ -607,3 +608,90 @@ class TestSampleEndpoints(AsyncHTTPTestCase):
         assert obj['paths']['/test']
         assert obj['paths']['/test']['head']
         assert obj['paths']['/test'].get('post') == None
+
+    @gen_test
+    def test_security_scheme1(self):
+        self.reset_settings()
+        swirl.describe(title='My API', description='My description')
+        swirl.add_security_scheme("test_basic", security.HTTP("basic"))
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def post(self):
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Security:
+                    test_basic
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+       
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['security']
+        assert obj['paths']['/test']['post']['security'][0]
+        assert 'test_basic' in obj['paths']['/test']['post']['security'][0]
+        
+
+        assert obj['components']
+        assert obj['components']['securitySchemes']
+        assert obj['components']['securitySchemes']['test_basic']
+        assert obj['components']['securitySchemes']['test_basic']['type'] == 'http'
+        assert obj['components']['securitySchemes']['test_basic']['scheme'] == 'basic'
+
+    @gen_test
+    def test_security_scheme2(self):
+        self.reset_settings()
+        swirl.describe(title='My API', description='My description')
+        swirl.add_security_scheme("test_basic", security.HTTP("bearer", bearerFormat="JWT"))
+        @swirl.restapi("/test")
+        class Handler(RequestHandler):
+
+            def post(self):
+                """This is the simple description.
+                With a second line.
+
+                Long description.
+                With a second line.
+
+                Security:
+                    test_basic
+
+                Request Body:
+                    user (User) -- sample user.
+            """
+            pass
+
+       
+
+        self.get_app().add_handlers(r".*", api_routes())
+        response = yield self.http_client.fetch(self.get_url('/swagger/spec'))
+        obj = json.loads(response.body.decode('utf-8'))
+
+        assert obj['paths']
+        assert obj['paths']['/test']
+        assert obj['paths']['/test']['post']
+        assert obj['paths']['/test']['post']['security']
+        assert obj['paths']['/test']['post']['security'][0]
+        assert 'test_basic' in obj['paths']['/test']['post']['security'][0]
+        
+
+        assert obj['components']
+        assert obj['components']['securitySchemes']
+        assert obj['components']['securitySchemes']['test_basic']
+        assert obj['components']['securitySchemes']['test_basic']['type'] == 'http'
+        assert obj['components']['securitySchemes']['test_basic']['scheme'] == 'bearer'
+        assert obj['components']['securitySchemes']['test_basic']['bearerFormat'] == 'JWT'

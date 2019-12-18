@@ -10,7 +10,11 @@ The main idea for this project is to automatically extract API specs from the us
 
 Swirl uses the ```@restapi``` decorator to get both the routing info AND the swagger spec which is derived from the method module docs. While ```@schema``` decorator is used to mark classes to include them into the ```components/schemas``` section of the resulting OpenAPI spec.
 
+## Recent News:
+* Tornado-Swirl has now moved to my personal Github account.
+
 ## Releases:
+* V. 0.1.20 -- Fix on basic auth security scheme spec, minor edits.
 * V. 0.1.19 -- Modified property name regex to accomodate JSON:API query strings with square brackets.
 * V. 0.1.18 -- Added support for ```example```/```examples``` for schema model types, bug fix on enum values with dash, updated swagger UI resources, code cleanup.
 * V. 0.1.17 -- Added support for ```object``` (freeform object) type, added support for schema inheritance, and ```json_mime_type``` option in ```swirl.describe(...)``` to enable JSON:API authors to specify ```application/vnd.api+json```.
