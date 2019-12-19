@@ -291,7 +291,7 @@ We decided on (almost like) Google style module docs for the doc format since ep
 
 ## Comments
 
-Please send your suggestions, comments to: r.duldulao@salarium.com
+Please send your suggestions, comments to: rnduldulaojr@gmail.com
 
-(c) 2018 [Salarium LTD](https://www.salarium.com).  All rights reserved. 
+
 
